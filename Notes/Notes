@@ -1,0 +1,19 @@
+
+1) The scevo build script accepts a few options :
+
+    --all        : rebuild the package, docker images and saved images
+    --just-save  : just save the docker images
+    --package    : build the package - by default it only builds the package if it's not there
+    --no-base    : dont build scevo_base
+
+
+2) if you are using this in shinyproxy an example config is included
+3) Changing shinyproxy config ( sudo vi /etc/shinyproxy/application.yml ) will
+   require a restart of shinyproxy server :
+
+      sudo service shinyproxy restart
+
+   and then there is a significant delay before it becomes usable.  Check
+   using :
+
+      sudo service shinyproxy status

@@ -1,0 +1,26 @@
+table_ord,table_name,spp_name,surveillance,notification
+1,Alex spp.,alexandrium_spp,1000,5000
+1,Alex spp.,alexandrium_minutum,1000,5000
+1,Alex spp.,alexandrium_pacificum,1000,5000
+1,Alex spp.,alexandrium_tamarense,1000,5000
+1,Alex spp.,alexandrium_pseudogonyaulax,1000,5000
+2,Dino spp.,dinophysis_acuminata,23,230
+2,Dino spp.,dinophysis_caudata,23,230
+2,Dino spp.,dinophysis_acuta,23,230
+2,Dino spp.,dinophysis_fortii,23,230
+3,Karenia spp.,karenia_papilionacea,50,500
+3,Karenia spp.,karenia_selliformis,50,500
+3,Karenia spp.,karenia_mikimotoi,50,500
+3,Karenia spp.,karenia_spp,50,500
+4,Karenia cf. brevis,karenia_cf_brevis,3,100
+4,Karenia cf. brevis,karenia_brevis,3,100
+5,Karlo spp.,karlodinium_spp,15000,30000
+5,Karlo spp.,karlodinium_veneficum,15000,30000
+5,Karlo spp.,karlodinium_armiger,15000,30000
+6,Pn seriata group,pseudonitzschia_seriata_group,10,50
+6,Pn seriata group,pseudonitzschia_seriata,10,50
+7,Pn delicatissima group,pseudonitzschia_delicatissima_group,100,500
+7,Pn delicatissima group,pseudonitzschia_delicatissima,100,500
+7,Pn delicatissima group,pseudonitzschia_spp,100,500
+8,H. akashiwo,heterosigma_akashiwo,20000,40000
+9,F. japonica,fibrocapsa_japonica,20000,40000

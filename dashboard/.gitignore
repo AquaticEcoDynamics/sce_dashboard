@@ -1,0 +1,13 @@
+scevo_0.0*.tar.gz
+.devcontainer
+.devcontainerOLD
+.Rproj.user
+.RData
+.RDataTmp
+.Ruserdata
+.Rhistory
+.Rapp.history
+*.Rcheck
+.Renviron
+.Rproj.user
+rsconnect
