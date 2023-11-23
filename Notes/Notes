@@ -7,7 +7,9 @@
     --no-base    : dont build scevo_base
 
 
-2) if you are using this in shinyproxy an example config is included
+2) if you are using this in shinyproxy ( see https://shinyproxy.io/documentation/getting-started/ )
+   an example config is included as application.yml
+
 3) Changing shinyproxy config ( sudo vi /etc/shinyproxy/application.yml ) will
    require a restart of shinyproxy server :
 

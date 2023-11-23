@@ -22,6 +22,7 @@ export RPAK=false
 export SAVE=false
 export BASE=true
 export SVONLY=false
+export DASHDIR=dashboard
 
 ARGS=""
 while [ $# -gt 0 ] ; do
@@ -46,6 +47,9 @@ while [ $# -gt 0 ] ; do
     --no-base)
       export BASE=false
       ;;
+    --update)
+      export DASHDIR=dashboard_update
+      ;;
     *)
       ;;
   esac
@@ -58,7 +62,7 @@ START=`date`
 if [ "$SVONLY" != "true" ] ; then
   if [ ! -f scevo_*.tar.gz ] || [ "$RPAK" = "true" ] ; then
     echo Building SCEVO R Package
-    cd dashboard
+    cd ${DASHDIR}
 
     R  -e "renv::restore()"
     if [ $? -ne 0 ] ; then
