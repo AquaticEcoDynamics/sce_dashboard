@@ -1,0 +1,7 @@
+{
+    "installOptions": {
+        "installFromRepository": true,
+        "libraryPath": "C:/Users/00101765/AED Dropbox/Sherry Zhai/SCEVO/dashboardcopy/renv/library/R-4.1/x86_64-w64-mingw32",
+        "installDependencies": true
+    }
+}

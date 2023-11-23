@@ -1,0 +1,41 @@
+Site,s_graph_value,s_table_name,lat,lon,agency,group,stationID,full_name
+Walyunga,Flow (m3/s),sensor_repository_00748,-31.75051861,116.0685348,DWER,flow,616011,Swan River - Walyunga
+Bennett Brook,Flow (m3/s),sensor_repository_00756,-31.87768898,115.9595364,DWER,flow,616084,Bennett Brook - Valley Brook Rd Caversham
+Jane Brook_Sweeting Bridge,Flow (m3/s),sensor_repository_00768,-31.8626875,116.0139953,DWER,flow,616088,Jane Brook - Sweeting Bridge Gt Nth Hwy Middle Swan
+Jane Brook_National Park,Flow (m3/s),sensor_repository_00784,-31.88394769,116.0948009,DWER,flow,616178,Jane Brook - National Park
+Susannah Brook,Flow (m3/s),sensor_repository_00796,-31.8176982,116.0140616,DWER,flow,616099,Susannah Brook - River Rd Herne Hill
+Ellen Brook,Flow (m3/s),sensor_repository_00800,-31.7510579,116.0248407,DWER,flow,616189,Ellen Brook - Almeria Pde Upper Swan
+Canning River,Flow (m3/s),sensor_repository_00804,-32.09229109,116.0167824,DWER,flow,616027,Canning River - Seaforth Gosnells
+Helena River,Flow (m3/s),sensor_repository_00812,-31.90006754,116.0076221,DWER,flow,616086,Helena River - Whiteman Rd
+Barrack St Jetty,Tide (m),sensor_repository_01087,-31.95969,115.85725,DOT-TIDE,tide,PTBAR02,Barrack Street 02 Tide Station
+Fremantle,Tide (m),sensor_repository_01081,-32.06556,115.74806,DOT-TIDE,tide,FFFBH01,Fremantle Fishing Boat Harbour
+Garden Is,Air temperature (deg C),sensor_repository_00234,-32.2433,115.6839,BOM-IDY,met,9256,
+Rottnest,Air temperature (deg C),sensor_repository_00627,-32.0069,115.5022,BOM-IDY,met,9193,
+Swanbourne,Air temperature (deg C),sensor_repository_00676,-31.956,115.7619,BOM-IDY,met,9215,
+Perth Metro,Air temperature (deg C),sensor_repository_00599,-31.9192,115.8728,BOM-IDY,met,9225,
+Jandakot,Air temperature (deg C),sensor_repository_00339,-32.1011,115.8794,BOM-IDY,met,9172,
+Meadow St Bridge,Tide (m),sensor_repository_01045,-31.864404,116.009083,BOM-IDW,tide,509378,
+Kent St Weir,Tide (m),sensor_repository_01047,-32.021388,115.92113,BOM-IDW,tide,509484,
+Hillarys,Tide (m),sensor_repository_01025,-31.8256,115.7386,BOM-IDO,tide,9265,HILLARYS_BOAT_HARBOUR_NTC_AWS
+Mandurah,Tide (m),sensor_repository_01093,-32.521931,115.714178,DOT-TIDE,tide,MHMAN02,Mandurah (Ocean Marina) Tide Station
+Peel Inlet,Tide (m),sensor_repository_01099,-32.592209,115.7139,DOT-TIDE,tide,PLPEE01,Peel Inlet Tide Station
+Canning,Tide (m),sensor_repository_01105,,,DOT-MOZ,tide,,
+Serpentine,Tide (m),sensor_repository_01111,,,DOT-MOZ,tide,,
+Garrat,Tide (m),sensor_repository_01117,,,DOT-MOZ,tide,,
+Guildford,Tide (m),sensor_repository_01123,,,DOT-MOZ,tide,,
+Ocean Reef,Air temperature (deg C),sensor_repository_00556,-31.7594,115.7278,BOM-IDY,met,9214,
+Perth Airport,Air temperature (deg C),sensor_repository_00571,-31.9275,115.9764,BOM-IDY,met,9021,
+Melville Water,Air temperature (deg C),sensor_repository_00493,-31.9889,115.8311,BOM-IDY,met,9091,
+Bayswater Main Drain_Slade St,Flow (m3/s),sensor_repository_00808,-31.92398874,115.9219495,DWER,flow,616082,Bayswater Main Drain - Slade St Bayswater
+Kwilena Buoy,Dissolved Oxygen (mg/L),sensor_repository_01167,-31.99889749,115.8442536,UWA-AED,mooring,,
+Kwilena Buoy,Dissolved Oxygen (% saturation),sensor_repository_01168,-31.99889749,115.8442536,UWA-AED,mooring,,
+Matilda Buoy,Dissolved Oxygen (mg/L),sensor_repository_01135,-31.9819283,115.822428,UWA-AED,mooring,,
+Matilda Buoy,Dissolved Oxygen (% saturation),sensor_repository_01136,-31.9819283,115.822428,UWA-AED,mooring,,
+Garden Is,Wind speed (knots),sensor_repository_00232,-32.2433,115.6839,BOM-IDY,met,9256,
+Rottnest,Wind speed (knots),sensor_repository_00625,-32.0069,115.5022,BOM-IDY,met,9193,
+Swanbourne,Wind speed (knots),sensor_repository_00674,-31.956,115.7619,BOM-IDY,met,9215,
+Perth Metro,Wind speed (knots),sensor_repository_00597,-31.9192,115.8728,BOM-IDY,met,9225,
+Jandakot,Wind speed (knots),sensor_repository_00337,-32.1011,115.8794,BOM-IDY,met,9172,
+Ocean Reef,Wind speed (knots),sensor_repository_00554,-31.7594,115.7278,BOM-IDY,met,9214,
+Perth Airport,Wind speed (knots),sensor_repository_00569,-31.9275,115.9764,BOM-IDY,met,9021,
+Melville Water,Wind speed (knots),sensor_repository_00491,-31.9889,115.8311,BOM-IDY,met,9091,

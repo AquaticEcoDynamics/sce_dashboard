@@ -1,0 +1,11 @@
+﻿group,subGroup,sensorCode,label,icon,colour,lat,lon,agency
+hydro,Flow,sensor_repository_00748,a,circle,#66c2a5,-32.065556,115.748056,DWER
+hydro,Flow,sensor_repository_00756,b ,circle,#fc8d62,-32.87770254,115.9595256,DWER
+hydro,Flow,sensor_repository_00768,c ,circle,#8da0cb,-31.86270096,116.0139846,DWER
+hydro,Flow,sensor_repository_00784,Jane Brook,circle,#e78ac3,-31.88396119,116.094791,DWER
+hydro,Flow,sensor_repository_00796,Susannah Brook,circle,#a6d854,-31.81771154,116.0140509,DWER
+hydro,Flow,sensor_repository_00800,Ellen Brook,circle,#ffd92f,-31.75107132,116.0248301,DWER
+hydro,Flow,sensor_repository_00804,Canning River,circle,#e5c494,-32.09230454,116.0167718,DWER
+hydro,Flow,sensor_repository_00812,Helena River,circle,#b3b3b3,-31.90008109,116.0076115,DWER
+hydro,Tide,sensor_repository_00933,Barrack St Jetty,circle,#66c2a5,-31.959694,115.85725,DOT
+hydro,Tide,sensor_repository_01080,Fremantle,circle,#fc8d62,-32.065556,115.748056,DOT

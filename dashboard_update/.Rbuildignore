@@ -1,0 +1,9 @@
+^renv$
+^renv\.lock$
+^.*\.Rproj$
+^\.Rproj\.user$
+^Dockerfile$
+^\.dockerignore$
+^data-raw$
+^app\.R$
+^rsconnect$

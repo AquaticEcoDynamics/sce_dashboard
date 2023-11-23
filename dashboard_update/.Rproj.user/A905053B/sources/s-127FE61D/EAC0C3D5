@@ -1,0 +1,26 @@
+{
+    "id": "EAC0C3D5",
+    "path": "C:/Users/00101765/AED Dropbox/AED_Swan_db/SCEVO/dashboard_update/R/app_server.R",
+    "project_path": "R/app_server.R",
+    "type": "r_source",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1693797082792.0,
+    "source_on_save": false,
+    "relative_order": 3,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "1069,21",
+        "scrollLine": "0"
+    },
+    "folds": "139|13|203|2|\n204|34|317|2|\n318|29|404|6|\n405|20|469|2|\n470|11|580|2|\n581|25|686|2|\n687|19|765|2|\n766|19|844|2|\n845|25|1000|2|\n1271|21|1533|0|\n1534|29|1549|4|\n1550|19|1763|8|\n1764|27|1781|2|\n1782|21|1841|2|\n1842|32|1903|0|\n1904|30|1944|2|\n2229|29|2304|4|\n2305|44|2357|4|\n2358|19|2373|2|\n2374|13|2389|2|\n",
+    "lastKnownWriteTime": 1700617241,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1700617241331,
+    "read_only": false,
+    "read_only_alternatives": []
+}

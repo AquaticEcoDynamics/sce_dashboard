@@ -1,0 +1,812 @@
+#Catchment Code Plotting 
+
+
+
+#startup
+#load libraries
+library(plyr)
+library(dplyr)
+library (tidyr)
+library(openxlsx)
+library(ggplot2)
+library(lubridate)
+library(EnvStats)
+
+dir<-"C:/Users/00101765/AED Dropbox/Sherry Zhai/SCEVO/data/Nutrients plotting/Catchment code"
+setwd(dir)
+
+#1.1 Read in Master Export file 
+Rawdata<-read.csv("C:/Users/00101765/AED Dropbox/Sherry Zhai/SCEVO/data/WQ_Jo/DBCA_data_export_2023-07-19_1615.csv")
+
+#1.2 Remove all unnecessary columns to create new dataframe. using only the parameters we are interested in.
+## (note that most of those excluded are empty)
+dat<-Rawdata%>%
+  select(1,2,3,4,5,6,7,8,11,12,13,14,21,24,27,30,33,36,39,47,48,50,51,53,54,56,57,59,60,63,66,68,69,71,72,77,78,86,87)
+
+
+
+
+#1.3 rename columns to something easier to code with
+dat <-dat %>% rename(Time = Collect.Time, Sample.Date = Collect.Date, Month = Collect.Month, Year = Collect.Year,
+                     Project = Program.Code, Site = Program.Site.Ref, Sal.ppt =Salinity..ppt., Temp=Temperature..deg.C., 
+                     ODO.mgl=O2..DO.conc...mg.L.,ODO.sat=O2..DO..sat....., pH=pH..no.units.,Turbidity.NTU=Turbidity..NTU.,
+                     TON.mgl=N..sum.sol.ox...NOx.N.TON...ug.L.,NH3.mgl=NH3.N.NH4.N..sol...ug.L.,DON.mgl=N..sum.sol.org...DON...ug.L.,
+                     TKN.mgl=N..tot.kjel...TKN...ug.L.,NO2.mgl=NO2.N..sol...ug.L.,NO3.mgl=NO3.N..sol...ug.L.,TP.mgl=P..tot...TP.pTP...ug.L.,
+                     FRP.mgl=PO4.P..sol.react...SRP.FRP...ug.L.,DOC.mgl=C..sol.org...DOC.DOC.as.NPOC...ug.L.,TSS.mgl=Suspended.Solids..Total...TSS...mg.L.,TN.mgl=N..tot...TN.pTN...ug.L.,
+                     SPCcondus.cm = Cond...25.deg.C..uS.cm., COC = Primary.CoC.Number)
+
+                   
+  
+  
+  
+  
+  #1.4 Convert analyte units from ug/L to mg/L.                  
+  dat$TN.mgl<-dat$TN.mgl*0.001
+dat$TON.mgl<-dat$TON.mgl*0.001
+dat$NH3.mgl<-dat$NH3.mgl*0.001
+dat$DON.mgl<-dat$DON.mgl*0.001
+dat$TKN.mgl<-dat$TKN.mgl*0.001
+dat$TP.mgl<-dat$TP.mgl*0.001
+dat$FRP.mgl<-dat$FRP.mgl*0.001
+dat$DOC.mgl<-dat$DOC.mgl*0.001
+
+
+
+
+
+#1.5 combine Sign columns with analyte columns to account for '<' symbols in data and halve them later on
+dat<-dat%>%
+  unite(TN.mgl, c("TN.Sign","TN.mgl"))%>%
+  unite(TON.mgl, c("NOx.N.Sign","TON.mgl"))%>%
+  unite(NH3.mgl, c("NH3.4.N.Sign","NH3.mgl"))%>%
+  unite(DON.mgl, c("DON.Sign","DON.mgl"))%>%
+  unite(TKN.mgl, c("TKN.Sign","TKN.mgl"))%>%
+  unite(TP.mgl, c("TP.Sign","TP.mgl"))%>%
+  unite(FRP.mgl, c("FRP.Sign","FRP.mgl"))%>%
+  unite(TSS.mgl, c("TSS.Sign","TSS.mgl"))%>%
+  unite(DOC.mgl, c("DOC.Sign","DOC.mgl"))
+
+
+
+
+#1.6 remove "_" between '<' symbol and analyte value 
+dat$TN.mgl<-gsub("_","",as.character(dat$TN.mgl))
+dat$TON.mgl<-gsub("_","",as.character(dat$TON.mgl))
+dat$NH3.mgl<-gsub("_","",as.character(dat$NH3.mgl))
+dat$DON.mgl<-gsub("_","",as.character(dat$DON.mgl))
+dat$TKN.mgl<-gsub("_","",as.character(dat$TKN.mgl))
+dat$TP.mgl<-gsub("_","",as.character(dat$TP.mgl))
+dat$FRP.mgl<-gsub("_","",as.character(dat$FRP.mgl))
+dat$TSS.mgl<-gsub("_","",as.character(dat$TSS.mgl))
+dat$DOC.mgl<-gsub("_","",as.character(dat$DOC.mgl))
+
+
+#1.7 halving less than values (standard procedure) so they can be converted into numerics
+dat$TN.mgl[dat$TN.mgl == "<0.025"] <- "0.0125"
+dat$TSS.mgl[dat$TSS.mgl == "<1"] <- "0.5"
+dat$FRP.mgl[dat$FRP.mgl == "<0.005"] <- "0.0025"
+dat$TON.mgl[dat$TON.mgl == "<0.01"] <- "0.005"
+dat$NH3.mgl[dat$NH3.mgl == "<0.01"] <- "0.005"
+dat$TP.mgl[dat$TP.mgl == "<0.005"] <- "0.0025"
+dat$TN.mgl[dat$TN.mgl == "<0.025"] <- "0.5"
+dat$DON.mgl[dat$DON.mgl == "<0.025"] <- "0.0125"
+dat$TKN.mgl[dat$TKN.mgl == "<0.025"] <- "0.0125"
+dat$DOC.mgl[dat$DOC.mgl == "<1"] <- "0.5"
+
+
+#1.8 remove "NA"s from analyte columns
+dat[dat=="NA"]<-""
+str(dat)
+
+#1.9 removes records with no sample numbers (essentially sites that weren't sampled due to them not flowing etc.) from 2100 to 1841
+dat<-dat[!dat$Sample.Number=="",];head(dat)
+sapply(dat, class)
+
+#1.11 filter out 2020 SWANCATCH & SCWQIP Sonde and laboratory Data
+histdat<-dat%>%
+  filter(Project %in% c("SG-C-SWANCATCH", "SG-C-SCWQIP")) %>%
+  filter(Year %in% c(2019,2018,2017,2016,2015))%>%
+  filter(Data.Category %in% c("Instrument log", "Laboratory results"))
+
+yrdat<-dat%>%
+  filter(Project %in% c("SG-C-SWANCATCH", "SG-C-SCWQIP")) %>%
+  filter(Year %in% c(2020))%>%
+  filter(Data.Category %in% c("Instrument log", "Laboratory results"))
+
+# 1.1x convert sonde data values to characters in prep for summary ( they are currently numerics) - we will convert back to numerics later on
+#sapply(dat2, class)
+#cols.num <- c("Sal.ppt", "Temp", "pH", "SPCcondus.cm", "ODO.sat", "ODO.mgl","NO2.mgl", "NO3.mgl")
+#dat2[cols.num] <- sapply(dat2[cols.num],as.character)
+#sapply(dat2, class)
+
+
+#1.12 Contcatenate all data by sample number (joins sonde and lab data by sample number into single row)
+histdat<-histdat %>% group_by( Sample.Date,Site.Ref, Year, Month, Sample.Number, COC,  Project, Site, Depth.measuring.point)%>%
+  summarise(DOC.mgl = max(DOC.mgl, na.rm = T),
+            SPCcondus.cm = max(SPCcondus.cm, na.rm = T),
+            DON.mgl = max(DON.mgl, na.rm = T),
+            TN.mgl = max(TN.mgl, na.rm = T),
+            TON.mgl = max(TON.mgl, na.rm = T),
+            NH3.mgl = max(NH3.mgl, na.rm = T),
+            ODO.sat = max(ODO.sat, na.rm = T),
+            ODO.mgl = max(ODO.mgl, na.rm = T),
+            TP.mgl = max(TP.mgl, na.rm = T),
+            pH = max(pH, na.rm = T),
+            FRP.mgl = max(FRP.mgl, na.rm = T),
+            Sal.ppt = max(Sal.ppt, na.rm = T),
+            Temp = max(Temp, na.rm = T),
+            TSS.mgl = max(TSS.mgl, na.rm = T),
+            TKN.mgl = max(TKN.mgl, na.rm = T))%>%
+  as.data.frame()
+
+yrdat<-yrdat %>% group_by( Sample.Date,Site.Ref, Year, Month, Sample.Number, COC,  Project, Site, Depth.measuring.point)%>%
+  summarise(DOC.mgl = max(DOC.mgl, na.rm = T),
+            SPCcondus.cm = max(SPCcondus.cm, na.rm = T),
+            DON.mgl = max(DON.mgl, na.rm = T),
+            TN.mgl = max(TN.mgl, na.rm = T),
+            TON.mgl = max(TON.mgl, na.rm = T),
+            NH3.mgl = max(NH3.mgl, na.rm = T),
+            ODO.sat = max(ODO.sat, na.rm = T),
+            ODO.mgl = max(ODO.mgl, na.rm = T),
+            TP.mgl = max(TP.mgl, na.rm = T),
+            pH = max(pH, na.rm = T),
+            FRP.mgl = max(FRP.mgl, na.rm = T),
+            Sal.ppt = max(Sal.ppt, na.rm = T),
+            Temp = max(Temp, na.rm = T),
+            TSS.mgl = max(TSS.mgl, na.rm = T),
+            TKN.mgl = max(TKN.mgl, na.rm = T))%>%
+  as.data.frame()
+
+histdat$Month<-month.abb[histdat$Month]
+yrdat$Month<-month.abb[yrdat$Month]
+write.csv(histdat,"histdat.csv")
+write.csv(yrdat,"2020dat.csv")
+
+
+
+
+Data$Sample.Date<-dmy(Data$Sample.Date)
+
+
+class(Data$Sample.Date)
+
+
+
+############################################################################# loops to plot figures for all sites ###############################################################
+
+
+###################create custom boxplot function to specify unique quartiles later#########################
+stat_boxplot_custom <- function(mapping = NULL, data = NULL,
+                                geom = "boxplot", position = "dodge",
+                                ...,
+                                qs = c(.05, .25, 0.5, 0.75, 0.95),
+                                na.rm = FALSE,
+                                show.legend = NA,
+                                inherit.aes = TRUE) {
+  layer(
+    data = data,
+    mapping = mapping,
+    stat = StatBoxplotCustom,
+    geom = geom,
+    position = position,
+    show.legend = show.legend,
+    inherit.aes = inherit.aes,
+    params = list(
+      na.rm = na.rm,
+      qs = qs,
+      ...
+    )
+  )
+}
+
+StatBoxplotCustom <- ggproto("StatBoxplotCustom", Stat,
+                             required_aes = c("x", "y"),
+                             non_missing_aes = "weight",
+                             setup_params = function(data, params) {
+                               params$width <- ggplot2:::"%||%"(params$width, (resolution(data$x) * 0.75))
+                               if (is.double(data$x) && !ggplot2:::has_groups(data) && any(data$x != data$x[1L])) {
+                                 warning(
+                                   "Continuous x aesthetic -- did you forget aes(group=...)?",
+                                   call. = FALSE)
+                               }
+                               params
+                             },
+                             compute_group = function(data, scales, width = NULL, na.rm = FALSE, qs = c(.05, .25, 0.5, 0.75, 0.95)) {
+                               if (!is.null(data$weight)) {
+                                 mod <- quantreg::rq(y ~ 1, weights = weight, data = data, tau = qs)
+                                 stats <- as.numeric(stats::coef(mod))
+                               } else {
+                                 stats <- as.numeric(stats::quantile(data$y, qs))
+                               }
+                               names(stats) <- c("ymin", "lower", "middle", "upper", "ymax")
+                               iqr <- diff(stats[c(2, 4)])
+                               outliers <- (data$y < stats[1]) | (data$y > stats[5])
+                               #if (any(outliers)) {
+                               #? stats[c(1, 5)] <- range(c(stats[2:4], data$y[!outliers]), na.rm = TRUE)
+                               #}
+                               if (length(unique(data$x)) > 1)
+                                 width <- diff(range(data$x)) * 0.9
+                               df <- as.data.frame(as.list(stats))
+                               df$outliers <- list(data$y[outliers])
+                               if (is.null(data$weight)) {
+                                 n <- sum(!is.na(data$y))
+                               } else {
+                                 # Sum up weights for non-NA positions of y and weight
+                                 n <- sum(data$weight[!is.na(data$y) & !is.na(data$weight)])
+                               }
+                               df$notchupper <- df$middle + 1.58 * iqr / sqrt(n)
+                               df$notchlower <- df$middle - 1.58 * iqr / sqrt(n)
+                               df$x <- if (is.factor(data$x)) data$x[1] else mean(range(data$x))
+                               df$width <- width
+                               df$relvarwidth <- sqrt(n)
+                               df
+                             }
+)
+
+
+
+
+##########################################begin plotting loop for TN################################
+#Read in Data 
+histdat<-read.csv("histdat.csv")
+yrdat<-read.csv("2020dat.csv")
+Sites <-unique(histdat$Site)
+
+
+for (i in Sites){
+  df.i <- as.data.frame(histdat)%>% 
+    filter(Site == i)
+  
+  #filter for each site
+  class(yrdat$Month)
+  median.TN<-yrdat %>%
+    group_by(Month,Site)%>%
+    filter(Site== i)%>%
+    summarise(TN.mgl = median(TN.mgl, na.rm = TRUE))
+  
+  
+  
+  g1<-histdat%>%
+    filter(Site== i)%>%
+    ggplot(aes(x = as.factor(Month), y =TN.mgl))+
+    stat_boxplot_custom(qs = c(.1, .25, 0.5, 0.75, 0.9),colour="skyblue2",alpha=0.5, width = .5,fill="skyblue2") +
+    stat_boxplot_custom(geom="errorbar",size = 0.5, width = 0.25, colour="skyblue2")+
+    theme(panel.background = element_blank(),panel.border = element_rect(colour = "black",fill = NA,size = .1))+
+    ggtitle(i)+
+    xlab("Month")+
+    ylab("Median TN (mg/L)")+
+    theme(axis.title.y = element_text(size = 11),axis.title.x = element_text(size = 11),title = element_text(size=11), axis.text.x = element_text(size=9),axis.text.y = element_text(size=9))+
+    scale_y_continuous(expand = expansion(c(0.02, 0.1)))+
+    scale_x_discrete(limits = month.abb)+
+    stat_n_text(color = "skyblue2", y.pos = -0.2, size=2.5)+
+    geom_point(data = median.TN, aes(x = as.factor(Month), y = (TN.mgl),group="median"))+
+    geom_line(data = median.TN,linetype= "dashed", aes(x = as.factor(Month), y = (TN.mgl),group="median"))
+  #geom_hline(yintercept = 1.2, linetype= "dashed", col="Red" )+
+  #geom_hline(yintercept = 0, linetype= "solid", col="black" )+
+  #scale_fill_manual(name="2015-2015", values="skyblue2")
+  
+  
+  path = paste0(dir,"/plots")
+  print(i)
+  ggsave(path=path,width=3.7, height=3.7, units ="in", dpi =500,g1,file=paste0(i,".TN.png",sep=" "),device = png)
+}
+
+#g1              
+
+#################################################################Loop to plot NH3 for all sites#############################################       
+#Read in Data 
+histdat<-read.csv("histdat.csv")
+yrdat<-read.csv("2020dat.csv")
+Sites <-unique(histdat$Site)
+
+
+for (i in Sites){
+  df.i <- as.data.frame(histdat)%>% 
+    filter(Site == i)
+  
+  #filter for each site
+  class(yrdat$Month)
+  median.NH3<-yrdat %>%
+    group_by(Month,Site)%>%
+    filter(Site== i)%>%
+    summarise(NH3.mgl = median(NH3.mgl, na.rm = TRUE))
+  
+  
+  
+  g1<-histdat%>%
+    filter(Site== i)%>%
+    ggplot(aes(x = as.factor(Month), y =NH3.mgl))+
+    stat_boxplot_custom(qs = c(.1, .25, 0.5, 0.75, 0.9),colour="skyblue2",alpha=0.5, width = .5,fill="skyblue2") +
+    stat_boxplot_custom(geom="errorbar",size = 0.5, width = 0.25, colour="skyblue2")+
+    theme(panel.background = element_blank(),panel.border = element_rect(colour = "black",fill = NA,size = .1))+
+    ggtitle(i)+
+    xlab("Month")+
+    ylab("Median NH3 (mg/L)")+
+    theme(axis.title.y = element_text(size = 11),axis.title.x = element_text(size = 11),title = element_text(size=9), axis.text.x = element_text(size=9),axis.text.y = element_text(size=9))+
+    scale_y_continuous(expand = expansion(c(0.02, 0.1)))+
+    scale_x_discrete(limits = month.abb)+
+    stat_n_text(color = "skyblue2", y.pos = -0.5, size=2.5)+
+    geom_point(data = median.NH3, aes(x = as.factor(Month), y = (NH3.mgl),group="median"))+
+    geom_line(data = median.NH3,linetype= "dashed", aes(x = as.factor(Month), y = (NH3.mgl),group="median"))
+  #geom_hline(yintercept = 1.2, linetype= "dashed", col="Red" )+
+  #scale_fill_manual(name="2015-2015", values="skyblue2")
+  
+  
+  path = "C:\\Users\\JakeWatsham\\OneDrive - Department of Biodiversity, Conservation and Attractions\\Catchment Reports\\2020\\Plots\\NH3"
+  print(i)
+  ggsave(path=path,width=3.7, height=3.7,units ="in", dpi =500,g1,file=paste0(i,".NH3.png",sep=" "),device = png)
+}
+
+#####
+####################################################################Loop to plot NOx-N (Ton) for all sites##########################################       
+histdat<-read.csv("histdat.csv")
+yrdat<-read.csv("2020dat.csv")
+
+
+#create loop to plot TN for all sites
+Sites <-unique(histdat$Site)
+
+for (i in Sites){
+  df.i <- as.data.frame(histdat)%>% 
+    filter(Site == i)
+  
+  #filter for each site
+  class(yrdat$Month)
+  median.TON<-yrdat %>%
+    group_by(Month,Site)%>%
+    filter(Site== i)%>%
+    summarise(TON.mgl = median(TON.mgl, na.rm = TRUE))
+  
+  #get medians for each month
+  #medianpoints<-median.TN%>%
+  #filter(Site==i)%>%
+  #ggplot
+  
+  
+  ###############Plotting         
+  g1<-histdat%>%
+    filter(Site== i)%>%
+    ggplot(aes(x = as.factor(Month), y =TON.mgl))+
+    stat_boxplot_custom(qs = c(.1, .25, 0.5, 0.75, 0.9),colour="skyblue2",alpha=0.5, width = .5,fill="skyblue2") +
+    stat_boxplot_custom(geom="errorbar",size = 0.5, width = 0.25, colour="skyblue2")+
+    theme(panel.background = element_blank(),panel.border = element_rect(colour = "black",fill = NA,size = .1))+
+    ggtitle(i)+
+    xlab("Month")+
+    ylab("Median NOx-N (mg/L)")+
+    theme(axis.title.y = element_text(size = 8),axis.title.x = element_text(size = 8),title = element_text(size=8), axis.text.x = element_text(size=6),axis.text.y = element_text(size=6))
+  scale_y_continuous(expand = expansion(c(0.02, 0.1)))+
+    scale_x_discrete(limits = month.abb)+
+    stat_n_text(color = "skyblue2", y.pos = -0.05, size=2.5)+
+    geom_point(data = median.TON, aes(x = as.factor(Month), y = (TON.mgl),group="median"))+
+    geom_line(data = median.TON,linetype= "dashed", aes(x = as.factor(Month), y = (TON.mgl),group="median"))+
+    geom_hline(yintercept = 0.15, linetype= "dashed", col="Red" )+
+    scale_fill_manual(name="2015-2015", values="skyblue2")
+  
+  
+  path = "C:\\Users\\JakeWatsham\\OneDrive - Department of Biodiversity, Conservation and Attractions\\Catchment Reports\\2020\\Plots\\NOx"
+  print(i)
+  ggsave(path=path,width=3.7, height=3.7,units ="in", dpi =500,g1,file=paste0(i,".NOx.png",sep=" "),device = png)
+}
+
+
+##################################################create loop to plot DORG  for all sites#############################
+histdat<-read.csv("histdat.csv")
+yrdat<-read.csv("2020dat.csv")
+
+Sites <-unique(histdat$Site)
+
+for (i in Sites){
+  df.i <- as.data.frame(histdat)%>% 
+    filter(Site == i)
+  
+  #filter for each site
+  class(yrdat$Month)
+  median.DON<-yrdat %>%
+    group_by(Month,Site)%>%
+    filter(Site== i)%>%
+    summarise(DON.mgl = median(DON.mgl, na.rm = TRUE))
+  
+  #get medians for each month
+  #medianpoints<-median.TN%>%
+  #filter(Site==i)%>%
+  #ggplot
+  
+  
+  ###############Plotting         
+  g1<-histdat%>%
+    filter(Site== i)%>%
+    ggplot(aes(x = as.factor(Month), y =DON.mgl))+
+    stat_boxplot_custom(qs = c(.1, .25, 0.5, 0.75, 0.9),colour="skyblue2",alpha=0.5, width = .5,fill="skyblue2") +
+    stat_boxplot_custom(geom="errorbar",size = 0.5, width = 0.25, colour="skyblue2")+
+    theme(panel.background = element_blank(),panel.border = element_rect(colour = "black",fill = NA,size = .1))+
+    theme(axis.title.y = element_text(size = 11),axis.title.x = element_text(size = 11),title = element_text(size=11), axis.text.x = element_text(size=9),axis.text.y = element_text(size=9))+
+    ggtitle(i)+
+    xlab("Month")+
+    ylab("Median DOrg-N (mg/L)")+
+    scale_y_continuous(expand = expansion(c(0.02, 0.1)))+
+    scale_x_discrete(limits = month.abb)+
+    stat_n_text(color = "skyblue2", y.pos = -0.1, size=2.5)+
+    geom_point(data = median.DON, aes(x = as.factor(Month), y = (DON.mgl),group="median"))+
+    geom_line(data = median.DON,linetype= "dashed", aes(x = as.factor(Month), y = (DON.mgl),group="median"))+
+    #geom_hline(yintercept = 1.2, linetype= "dashed", col="Red" )+
+    scale_fill_manual(name="2015-2015", values="skyblue2")
+  
+  
+  path = "C:\\Users\\JakeWatsham\\OneDrive - Department of Biodiversity, Conservation and Attractions\\Catchment Reports\\2020\\Plots\\DON"
+  print(i)
+  ggsave(path=path,width=3.7, height=3.7,units ="in", dpi =500,g1,file=paste0(i,".DOrgN.png",sep=" "),device = png)
+}
+
+
+
+
+#######################################################loop for TP###################################
+histdat<-read.csv("histdat.csv")
+yrdat<-read.csv("2020dat.csv")
+
+Sites <-unique(histdat$Site)
+
+for (i in Sites){
+  df.i <- as.data.frame(histdat)%>% 
+    filter(Site == i)
+  
+  #filter for each site
+  class(yrdat$Month)
+  median.TP<-yrdat %>%
+    group_by(Month,Site)%>%
+    filter(Site== i)%>%
+    summarise(TP.mgl = median(TP.mgl, na.rm = TRUE))
+  
+  #get medians for each month
+  #medianpoints<-median.TN%>%
+  #filter(Site==i)%>%
+  #ggplot
+  
+  
+  ###############Plotting         
+  g1<-histdat%>%
+    filter(Site== i)%>%
+    ggplot(aes(x = as.factor(Month), y =TP.mgl))+
+    stat_boxplot_custom(qs = c(.1, .25, 0.5, 0.75, 0.9),colour="skyblue2",alpha=0.5, width = .5,fill="skyblue2") +
+    stat_boxplot_custom(geom="errorbar",size = 0.5, width = 0.25, colour="skyblue2")+
+    theme(panel.background = element_blank(),panel.border = element_rect(colour = "black",fill = NA,size = .1))+
+    ggtitle(i)+
+    xlab("Month")+
+    ylab("Median TP (mg/L)")+
+    theme(axis.title.y = element_text(size = 8),axis.title.x = element_text(size = 8),title = element_text(size=8), axis.text.x = element_text(size=6),axis.text.y = element_text(size=6))
+  scale_y_continuous(expand = expansion(c(0.02, 0.1)))+
+    scale_x_discrete(limits = month.abb)+
+    stat_n_text(color = "skyblue2", y.pos = -0.01, size=2.5)+
+    geom_point(data = median.TP, aes(x = as.factor(Month), y = (TP.mgl),group="median"))+
+    geom_line(data = median.TP,linetype= "dashed", aes(x = as.factor(Month), y = (TP.mgl),group="median"))+
+    geom_hline(yintercept = 0.065, linetype= "dashed", col="Red" )+
+    scale_fill_manual(name="2015-2015", values="skyblue2")
+  
+  
+  path = "C:\\Users\\JakeWatsham\\OneDrive - Department of Biodiversity, Conservation and Attractions\\Catchment Reports\\2020\\Plots\\TP"
+  print(i)
+  ggsave(path=path,width=3.7, height=3.7,units ="in", dpi =500,g1,file=paste0(i,".TP.png",sep=" "),device = png)
+}
+
+#############################################################Loop for FRP#########################################
+
+histdat<-read.csv("histdat.csv")
+yrdat<-read.csv("2020dat.csv")
+
+Sites <-unique(histdat$Site)
+
+for (i in Sites){
+  df.i <- as.data.frame(histdat)%>% 
+    filter(Site == i)
+  
+  #filter for each site
+  class(yrdat$Month)
+  median.FRP<-yrdat %>%
+    group_by(Month,Site)%>%
+    filter(Site== i)%>%
+    summarise(FRP.mgl = median(FRP.mgl, na.rm = TRUE))
+  
+  #get medians for each month
+  #medianpoints<-median.TN%>%
+  #filter(Site==i)%>%
+  #ggplot
+  
+  
+  ###############Plotting         
+  g1<-histdat%>%
+    filter(Site== i)%>%
+    ggplot(aes(x = as.factor(Month), y =FRP.mgl))+
+    stat_boxplot_custom(qs = c(.1, .25, 0.5, 0.75, 0.9),colour="skyblue2",alpha=0.5, width = .5,fill="skyblue2") +
+    stat_boxplot_custom(geom="errorbar",size = 0.5, width = 0.25, colour="skyblue2")+
+    theme(panel.background = element_blank(),panel.border = element_rect(colour = "black",fill = NA,size = .1))+
+    ggtitle(i)+
+    xlab("Month")+
+    ylab("Median FRP (mg/L)")+
+    theme(axis.title.y = element_text(size = 8),axis.title.x = element_text(size = 8),title = element_text(size=8), axis.text.x = element_text(size=6),axis.text.y = element_text(size=6))
+  scale_y_continuous(expand = expansion(c(0.02, 0.1)))+
+    scale_x_discrete(limits = month.abb)+
+    stat_n_text(color = "skyblue2", y.pos = -0.002, size=2.5)+
+    geom_point(data = median.FRP, aes(x = as.factor(Month), y = (FRP.mgl),group="median"))+
+    geom_line(data = median.FRP,linetype= "dashed", aes(x = as.factor(Month), y = (FRP.mgl),group="median"))+
+    geom_hline(yintercept = 0.04, linetype= "dashed", col="Red" )+
+    scale_fill_manual(name="2015-2015", values="skyblue2")
+  
+  
+  path = "C:\\Users\\JakeWatsham\\OneDrive - Department of Biodiversity, Conservation and Attractions\\Catchment Reports\\2020\\Plots\\FRP"
+  print(i)
+  ggsave(path=path,width=3.7, height=3.7,units ="in", dpi =500,g1,file=paste0(i,".FRP.png",sep=" "),device = png)
+}
+
+#######################################################LOOP For DOC#########################
+histdat<-read.csv("histdat.csv")
+yrdat<-read.csv("2020dat.csv")
+
+Sites <-unique(histdat$Site)
+
+for (i in Sites){
+  df.i <- as.data.frame(histdat)%>% 
+    filter(Site == i)
+  
+  #filter for each site
+  class(yrdat$DOC.mgl)
+  median.DOC<-yrdat %>%
+    group_by(Month,Site)%>%
+    filter(Site== i)%>%
+    summarise(DOC.mgl = median(DOC.mgl, na.rm = TRUE))
+  
+  #get medians for each month
+  #medianpoints<-median.TN%>%
+  #filter(Site==i)%>%
+  #ggplot
+  
+  
+  ###############Plotting         
+  g1<-histdat%>%
+    filter(Site== i)%>%
+    ggplot(aes(x = as.factor(Month), y =DOC.mgl))+
+    stat_boxplot_custom(qs = c(.1, .25, 0.5, 0.75, 0.9),colour="skyblue2",alpha=0.5, width = .5,fill="skyblue2") +
+    stat_boxplot_custom(geom="errorbar",size = 0.5, width = 0.25, colour="skyblue2")+
+    theme(panel.background = element_blank(),panel.border = element_rect(colour = "black",fill = NA,size = .1))+
+    ggtitle(i)+
+    xlab("Month")+
+    ylab("Median DOC (mg/L)")+
+    theme(axis.title.y = element_text(size = 8),axis.title.x = element_text(size = 8),title = element_text(size=8), axis.text.x = element_text(size=6),axis.text.y = element_text(size=6))
+  scale_y_continuous(expand = expansion(c(0.02, 0.1)))+
+    scale_x_discrete(limits = month.abb)+
+    stat_n_text(color = "skyblue2", y.pos = -0.01, size=2.5)+
+    geom_point(data = median.DOC, aes(x = as.factor(Month), y = (DOC.mgl),group="median"))+
+    geom_line(data = median.DOC,linetype= "dashed", aes(x = as.factor(Month), y = (DOC.mgl),group="median"))+
+    #geom_hline(yintercept = 0.04, linetype= "dashed", col="Red" )+
+    scale_fill_manual(name="2015-2015", values="skyblue2")
+  
+  
+  path = "C:\\Users\\JakeWatsham\\OneDrive - Department of Biodiversity, Conservation and Attractions\\Catchment Reports\\2020\\Plots\\DOC"
+  print(i)
+  ggsave(path=path,width=3.7, height=3.7,units ="in", dpi =500,g1,file=paste0(i,".DOC.png",sep=" "),device = png)
+}
+
+#############################################################LOOP FOR TSS######################################################
+
+histdat<-read.csv("histdat.csv")
+yrdat<-read.csv("2020dat.csv")
+
+Sites <-unique(histdat$Site)
+
+for (i in Sites){
+  df.i <- as.data.frame(histdat)%>% 
+    filter(Site == i)
+  
+  #filter for each site
+  yrdat$TSS.mgl<-as.numeric(yrdat$TSS.mgl)
+  histdat$TSS.mgl<-as.numeric(histdat$TSS.mgl)
+  #class(yrdat$TSS.mgl)
+  median.TSS<-yrdat %>%
+    group_by(Month,Site)%>%
+    filter(Site== i)%>%
+    summarise(TSS.mgl = median(TSS.mgl, na.rm = TRUE))
+  
+  #get medians for each month
+  #medianpoints<-median.TN%>%
+  #filter(Site==i)%>%
+  #ggplot
+  
+  
+  ###############Plotting         
+  g1<-histdat%>%
+    filter(Site== i)%>%
+    ggplot(aes(x = as.factor(Month), y =TSS.mgl))+
+    stat_boxplot_custom(qs = c(.1, .25, 0.5, 0.75, 0.9),colour="skyblue2",alpha=0.5, width = .5,fill="skyblue2") +
+    stat_boxplot_custom(geom="errorbar",size = 0.5, width = 0.25, colour="skyblue2")+
+    theme(panel.background = element_blank(),panel.border = element_rect(colour = "black",fill = NA,size = .1))+
+    ggtitle(i)+
+    xlab("Month")+
+    ylab("Median TSS (mg/L)")+
+    theme(axis.title.y = element_text(size = 11),axis.title.x = element_text(size = 11),title = element_text(size=11), axis.text.x = element_text(size=9),axis.text.y = element_text(size=9))+
+    scale_y_continuous(expand = expansion(c(0.02, 0.1)))+
+    scale_x_discrete(limits = month.abb)+
+    stat_n_text(color = "skyblue2", y.pos = -5, size=2.5)+
+    geom_point(data = median.TSS, aes(x = as.factor(Month), y = (TSS.mgl),group="median"))+
+    geom_line(data = median.TSS,linetype= "dashed", aes(x = as.factor(Month), y = (TSS.mgl),group="median"))+
+    #geom_hline(yintercept = 0.04, linetype= "dashed", col="Red" )+
+    scale_fill_manual(name="2015-2015", values="skyblue2")
+  
+  
+  path = "C:\\Users\\JakeWatsham\\OneDrive - Department of Biodiversity, Conservation and Attractions\\Catchment Reports\\2020\\Plots\\TSS"
+  print(i)
+  ggsave(path=path,width=3.7, height=3.7,units ="in", dpi =500,g1,file=paste0(i,".TSS.png",sep=" "),device = png)
+}
+
+
+
+
+
+########################################################loop for DO#################################
+histdat<-read.csv("histdat.csv")
+yrdat<-read.csv("2020dat.csv")
+
+Sites <-unique(histdat$Site)
+
+for (i in Sites){
+  df.i <- as.data.frame(histdat)%>% 
+    filter(Site == i)
+  
+  #filter for each site
+  #class(yrdat$TSS.mgl)
+  median.ODO<-yrdat %>%
+    group_by(Month,Site)%>%
+    filter(Site== i)%>%
+    summarise(ODO.mgl = median(ODO.mgl, na.rm = TRUE))
+  
+  #get medians for each month
+  #medianpoints<-median.TN%>%
+  #filter(Site==i)%>%
+  #ggplot
+  
+  
+  ###############Plotting         
+  g1<-histdat%>%
+    filter(Site== i)%>%
+    ggplot(aes(x = as.factor(Month), y =ODO.mgl))+
+    stat_boxplot_custom(qs = c(.1, .25, 0.5, 0.75, 0.9),colour="skyblue2",alpha=0.5, width = .5,fill="skyblue2") +
+    stat_boxplot_custom(geom="errorbar",size = 0.5, width = 0.25, colour="skyblue2")+
+    theme(panel.background = element_blank(),panel.border = element_rect(colour = "black",fill = NA,size = .1))+
+    ggtitle(i)+
+    xlab("Month")+
+    ylab("Median DO (mg/L)")+
+    theme(axis.title.y = element_text(size = 8),axis.title.x = element_text(size = 8),title = element_text(size=8), axis.text.x = element_text(size=6),axis.text.y = element_text(size=6))
+  scale_y_continuous(expand = expansion(c(0.02, 0.1)))+
+    scale_x_discrete(limits = month.abb)+
+    stat_n_text(color = "skyblue2", y.pos = -0.1, size=2.5)+
+    geom_point(data = median.ODO, aes(x = as.factor(Month), y = (ODO.mgl),group="median"))+
+    geom_line(data = median.ODO,linetype= "dashed", aes(x = as.factor(Month), y = (ODO.mgl),group="median"))+
+    #geom_hline(yintercept = 0.04, linetype= "dashed", col="Red" )+
+    scale_fill_manual(name="2015-2015", values="skyblue2")
+  
+  
+  path = "C:\\Users\\JakeWatsham\\OneDrive - Department of Biodiversity, Conservation and Attractions\\Catchment Reports\\2020\\Plots\\DO"
+  print(i)
+  ggsave(path=path,width=3.7, height=3.7,units ="in", dpi =500,g1,file=paste0(i,".ODO.png",sep=" "),device = png)
+}
+
+################################################# plot loop for sp. cond in ms/cm ##################################################
+histdat<-read.csv("histdat.csv")
+yrdat<-read.csv("2020dat.csv")
+####convert spcondus.cm from us to ms.
+histdat$SPCcondus.cm<-histdat$SPCcondus.cm*0.001
+yrdat$SPCcondus.cm<-yrdat$SPCcondus.cm*0.001
+
+Sites <-unique(histdat$Site)
+
+for (i in Sites){
+  df.i <- as.data.frame(histdat)%>% 
+    filter(Site == i)
+  
+  #filter for each site
+  #class(yrdat$TSS.mgl)
+  median.SPCond<-yrdat %>%
+    group_by(Month,Site)%>%
+    filter(Site== i)%>%
+    summarise(SPCcondus.cm = median(SPCcondus.cm, na.rm = TRUE))
+  
+  #get medians for each month
+  #medianpoints<-median.TN%>%
+  #filter(Site==i)%>%
+  #ggplot
+  
+  
+  ###############Plotting         
+  g1<-histdat%>%
+    filter(Site== i)%>%
+    ggplot(aes(x = as.factor(Month), y =SPCcondus.cm))+
+    stat_boxplot_custom(qs = c(.1, .25, 0.5, 0.75, 0.9),colour="skyblue2",alpha=0.5, width = .5,fill="skyblue2") +
+    stat_boxplot_custom(geom="errorbar",size = 0.5, width = 0.25, colour="skyblue2")+
+    theme(panel.background = element_blank(),panel.border = element_rect(colour = "black",fill = NA,size = .1))+
+    ggtitle(i)+
+    xlab("Month")+
+    ylab("Median Sp.Cond (mS/cm)")+
+    theme(axis.title.y = element_text(size = 8),axis.title.x = element_text(size = 8),title = element_text(size=8), axis.text.x = element_text(size=6),axis.text.y = element_text(size=6))+
+    scale_y_continuous(expand = expansion(c(0.02, 0.1)))+
+    scale_x_discrete(limits = month.abb)+
+    stat_n_text(color = "skyblue2", y.pos = -0.5, size=2.5)+
+    geom_point(data = median.SPCond, aes(x = as.factor(Month), y = (SPCcondus.cm),group="median"))+
+    geom_line(data = median.SPCond,linetype= "dashed", aes(x = as.factor(Month), y = (SPCcondus.cm),group="median"))+
+    #geom_hline(yintercept = 0.04, linetype= "dashed", col="Red" )+
+    scale_fill_manual(name="2015-2015", values="skyblue2")
+  
+  path = "C:\\Users\\JakeWatsham\\OneDrive - Department of Biodiversity, Conservation and Attractions\\Catchment Reports\\2020\\Plots\\Sp.Cond"
+  print(i)
+  ggsave(path=path,width=3.7, height=3.7,units ="in", dpi =500,g1,file=paste0(i,".Sp.Cond.png",sep=" "),device = png)
+}
+
+
+
+
+
+#####################################Plot loop for total annual discharge at each available site###############################
+
+discharge<-read.csv("2020 Discharge data.csv")
+
+discharge$Date<-dmy(discharge$Date)
+Sites <-unique(discharge$Site)
+
+for (i in Sites){
+  df.i <- as.data.frame(discharge)%>% 
+    filter(Site == i)
+  
+  
+  
+  plot1<-discharge%>%
+    filter(Site==i)%>%
+    ggplot(aes(x=Date, y=ML),color="black") +
+    geom_line()+
+    scale_y_continuous(name="Daily discharge rate (ML)")+
+    scale_x_date(name = "Date", breaks = "1 month", date_labels = "%b")+
+    ggtitle(i)+
+    theme(panel.background = element_blank(),panel.border = element_rect(colour = "black",fill = NA,size = .1))
+  
+  
+  path = "C:\\Users\\JakeWatsham\\OneDrive - Department of Biodiversity, Conservation and Attractions\\Catchment Reports\\2020\\Plots\\Discharge"
+  print(i)
+  ggsave(path=path,width=5, height=5,plot1,file=paste0(i,".discharge.png",sep=" "),device = png)
+}
+
+###########################Plot for total daily rainfall###############
+
+rainfall<-read.csv("2020 Rainfall data.csv")
+
+rainfall$Date<-dmy(rainfall$Date)
+
+
+plot1<-rainfall%>%
+  ggplot(aes(x=Date, y=Rainfall),color="black") +
+  geom_line()+
+  scale_y_continuous(name="Daily rainfall (mm)")+
+  scale_x_date(name = "Date", breaks = "1 month", date_labels = "%b")+
+  ggtitle(" Perth Daily Rainfall 2020 (mm)")+
+  theme(panel.background = element_blank(),panel.border = element_rect(colour = "black",fill = NA,size = .1))
+
+plot1  
+path = "C:\\Users\\JakeWatsham\\OneDrive - Department of Biodiversity, Conservation and Attractions\\Catchment Reports\\2020\\Plots\\Rainfall"
+ggsave(path=path,width=5, height=5,plot1,file=paste0("2020.rainfall.png",sep=" "),device = png)
+
+
+##########################Plot for mean daily rainfall from 2015-2019#################
+
+rainfall<-read.csv("2015-2020 daily mean R.csv")
+
+rainfall$date<-dmy(rainfall$date)
+
+
+plot1<-rainfall%>%
+  ggplot(aes(x=date, y=mean.rainfall),color="black") +
+  geom_line()+
+  scale_y_continuous(name="Mean daily rainfall (mm)")+
+  scale_x_date(name = "Date", breaks = "1 month", date_labels = "%b")+
+  ggtitle("Perth mean daily rainfall 2015-2020 (mm)")+
+  theme(panel.background = element_blank(),panel.border = element_rect(colour = "black",fill = NA,size = .1))
+
+
+plot1  
+path = "C:\\Users\\JakeWatsham\\OneDrive - Department of Biodiversity, Conservation and Attractions\\Catchment Reports\\2020\\Plots\\Rainfall"
+ggsave(path=path,width=5, height=5,plot1,file=paste0("2015-2020.mean rainfall.png",sep=" "),device = png)
+

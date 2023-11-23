@@ -1,0 +1,24 @@
+Species_Name,Surveillance trigger,Notification trigger
+Alexandrium catenella,1000,5000
+Alexandrium minutum,1000,5000
+Alexandrium spp,1000,5000
+Alexandrium tamarense,1000,5000
+Dinophysis acuminata,23,230
+Dinophysis caudata,23,230
+Dinophysis pulchella,23,230
+Dinophysis spp,23,230
+Fibrocapsa japonica,20000,40000
+GK complex (Gymnodinium/Karenia complex),50,500
+Heterosigma akashiwo,20000,40000
+Heterosigma spp,20000,40000
+Karenia brevis,3,100
+Karenia mikimotoi,50,500
+Karenia papilionacea,50,500
+Karenia selliformis,50,500
+Karenia spp,50,500
+Karlodinium armiger,15000,30000
+Karlodinium spp,15000,30000
+Karlodinium veneficum,15000,30000
+"Pseudonitzschia ""delicatissima group""",100,500
+"Pseudonitzschia ""seriata group""",10,50
+Pseudonitzschia delicatissima group,100,500

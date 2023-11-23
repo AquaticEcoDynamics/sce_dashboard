@@ -1,0 +1,103 @@
+default:
+  golem_name: scevo
+  golem_version: 0.0.0.9000
+  app_prod: no
+production:
+  app_prod: yes
+dev:
+  golem_wd: !expr here::here()
+
+database_connection: 
+  enable: 'false'
+  #if true - connect to ARMS (on campus), if false - connect to Pawsey S3 bucket (off campus)
+
+database:
+  host: 130.95.44.39
+  #host: 130.95.204.63
+  port: '5433'
+  dbname: scevo 
+  user: dpaw_write
+  password: dpaw_write
+database_data:
+  sensor_code_field: st_sensor_code
+  data_value_field: st_value_1_new
+  data_date_field: st_feed_date_jdn
+mod_weather:
+  enable: 'true'
+mod_weather_temp:
+  enable: 'true'
+  # name: Garden Is, Rottnest, Swanbourne, Perth Metro , Jandakot
+  # sensor_code: sensor_repository_00234, sensor_repository_00627, sensor_repository_00676,
+  #   sensor_repository_00599 , sensor_repository_00339
+  # icon: circle, circle, circle, circle , circle
+  # colour: '#66c2a5, #fc8d62, #e78ac3, #e5c494, #b3b3b3'
+  # lat: -32.227073, -32.0064404, -31.9857066, -31.9497688 , -32.094593
+  # lon: 115.682991, 115.5122858, 115.7607396, 115.8491908 , 115.87849
+  # source: BOM, BOM, BOM, BOM, BOM
+
+mod_hydro:
+  enable: 'true'
+mod_hydro_flow:
+  enable: 'true'
+  # name: Avon,Bennett Brook,Upper Swan,Jane Brook,Susannah Brook,Ellen Brook,Canning River ,Helena River
+  # sensor_code: sensor_repository_00748,sensor_repository_00756,sensor_repository_00768,
+  #   sensor_repository_00784,sensor_repository_00796,sensor_repository_00800,
+  #   sensor_repository_00804 ,sensor_repository_00812
+  # icon: circle, circle, circle, circle, circle, circle, circle , circle
+  # colour: '#66c2a5, #fc8d62, #8da0cb, #e78ac3,#a6d854, #ffd92f, #e5c494 , #b3b3b3'
+  # lat: -32.065556, -32.87770254, -31.86270096, -31.88396119, -31.81771154, -31.75107132, -32.09230454 , -31.90008109
+  # lon: 115.748056, 115.9595256,  116.0139846,  116.094791,   116.0140509,  116.0248301,  116.0167718 ,  116.0076115
+  # source: DWER,DWER,DWER,DWER,DWER,DWER,DWER,DWER
+mod_hydro_tide:
+  enable: 'true'
+  # name: Barrack St Jetty,Fremantle
+  # sensor_code: sensor_repository_01087,sensor_repository_01081
+  # icon: circle, circle
+  # colour: '#66c2a5,#fc8d62'
+  # lat: -31.959694,-32.065556
+  # lon: 115.85725,115.748056
+  # source: DOT, DOT
+
+mod_wq:
+  enable: 'true'
+mod_wq_catch:
+  enable: 'true'
+  # name: dummy1, dummy2, dummy3
+  # sensor_code: sensor_repository_11111,sensor_repository_11112,sensor_repository_11113
+  # icon: circle, circle, circle
+  # colour: '#66c2a5, #fc8d62, #8da0cb'
+  # lat: -31.931225, -31.914643, -32.038306
+  # lon: 115.940908, 115.949454,  115.917321
+  # source: DBCA, DBCA,DBCA
+mod_wq_est:
+  enable: 'true'
+  # name: Barrack St Jetty,Fremantle
+  # sensor_code: sensor_repository_00933,sensor_repository_01080
+  # icon: circle, circle
+  # colour: '#66c2a5,#fc8d62'
+  # lat: -31.959694,-32.065556
+  # lon: 115.85725,115.748056
+  # source: DOT, DOT
+  
+mod_wq_mooring:
+  enable: 'true'
+  
+mod_phyto:
+  enable: 'true'
+  
+mod_hab:
+  enable: 'false'
+
+# mod_mooring_sysBatt:
+#   enable: 'true'
+#   name: Kwilena
+#   sensor_code: sensor_repository_01180
+#   icon: circle
+#   colour: '#66c2a5'
+#   lat: '-32.078355232'
+#   lon: '115.978799149'
+#   source: UWA
+# mod_init:
+#   name: Module 1, Module 2
+#   id: mod1, mod2
+#   icon: water, cloud-sun
