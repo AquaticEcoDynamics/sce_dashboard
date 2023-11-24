@@ -2,3 +2,5 @@ scevo_*.tar.gz
 scevo.tar
 scevo_base.tar
 .DS_Store
+renv.lock
+www
