@@ -58,14 +58,13 @@ done
 
 START=`date`
 
-if [ -f renv.lock ] ; then
-  /bin/rm renv.lock
-fi
-ln -s ${DASHDIR}/www .
-if [ -f www ] ; then
-  /bin/rm www
-fi
+/bin/rm renv.lock www Dockerfile Dockerfile_base
+
 ln -s ${DASHDIR}/renv.lock .
+ln -s ${DASHDIR}/www .
+ln -s Dockerfile_${DASHDIR} Dockerfile
+ln -s Dockerfile_base_${DASHDIR} Dockerfile_base
+
 # if we're not just saving the docker
 if [ "$SVONLY" != "true" ] ; then
   if [ ! -f scevo_*.tar.gz ] || [ "$RPAK" = "true" ] ; then
