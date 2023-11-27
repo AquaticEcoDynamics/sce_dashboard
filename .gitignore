@@ -4,5 +4,3 @@ scevo_base.tar
 .DS_Store
 renv.lock
 www
-Dockerfile
-Dockerfile_base
