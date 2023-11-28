@@ -58,12 +58,10 @@ done
 
 START=`date`
 
-/bin/rm renv.lock www Dockerfile Dockerfile_base
+/bin/rm renv.lock www
 
 ln -s ${DASHDIR}/renv.lock .
 ln -s ${DASHDIR}/www .
-ln -s Dockerfile_${DASHDIR} Dockerfile
-ln -s Dockerfile_base_${DASHDIR} Dockerfile_base
 
 # if we're not just saving the docker
 if [ "$SVONLY" != "true" ] ; then
@@ -79,7 +77,7 @@ if [ "$SVONLY" != "true" ] ; then
 
     R  -e "devtools::build()"
     # options(golem.app.prod = FALSE)  # TRUE for production, FALSE for development
-    R  -e "options(golem.app.prod = FALSE);golem::detach_all_attached();golem::document_and_reload()"
+    R  -e "options(golem.app.prod = TRUE);golem::detach_all_attached();golem::document_and_reload()"
 
     cd ..
   fi
