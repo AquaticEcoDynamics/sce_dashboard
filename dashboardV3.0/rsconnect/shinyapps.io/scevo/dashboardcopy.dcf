@@ -1,0 +1,10 @@
+name: dashboardcopy
+title: dashboardcopy
+username: scevo
+account: scevo
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 9659090
+bundleId: 7614524
+url: https://scevo.shinyapps.io/dashboardcopy/
+version: 1

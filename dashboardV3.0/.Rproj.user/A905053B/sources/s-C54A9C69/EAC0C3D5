@@ -1,0 +1,26 @@
+{
+    "id": "EAC0C3D5",
+    "path": "C:/Users/00101765/AED Dropbox/Sherry Zhai/SCEVO/dashboardV3.0/R/app_server.R",
+    "project_path": "R/app_server.R",
+    "type": "r_source",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1693797082792.0,
+    "source_on_save": false,
+    "relative_order": 3,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "350,54",
+        "scrollLine": "341"
+    },
+    "folds": "22|15|149|2|\n150|13|214|2|\n215|34|328|2|\n416|20|480|2|\n481|23|486|6|\n487|11|597|2|\n598|25|703|2|\n704|19|782|2|\n783|19|861|2|\n862|20|867|2|\n868|25|1023|2|\n1573|19|1786|8|\n1787|27|1804|2|\n1805|21|1864|2|\n1865|32|1926|0|\n1927|30|1995|4|\n1996|19|2119|2|\n2120|17|2125|2|\n2126|23|2127|2|\n2128|44|2283|2|\n2284|34|2288|5|\n2289|29|2364|4|\n2365|44|2417|4|\n2517|13|2532|2|\n",
+    "lastKnownWriteTime": 1701915294,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1701924014286,
+    "read_only": false,
+    "read_only_alternatives": []
+}

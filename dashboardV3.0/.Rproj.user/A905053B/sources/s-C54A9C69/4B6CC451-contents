@@ -1,0 +1,63 @@
+default:
+  golem_name: scevo
+  golem_version: 0.0.0.9000
+  app_prod: no
+production:
+  app_prod: yes
+dev:
+  golem_wd: !expr here::here()
+
+database_connection: 
+  enable: 'false'
+  #if true - connect to ARMS (on campus), if false - connect to Pawsey S3 bucket (off campus)
+  
+wiski_connection: 
+  enable: 'true'
+  #if true - connect to Pawsey S3 bucket, if false - use local file in \www\
+
+database:
+  host: 130.95.44.39
+  #host: 130.95.204.63
+  port: '5433'
+  dbname: scevo 
+  user: dpaw_write
+  password: dpaw_write
+  
+database_data:
+  sensor_code_field: st_sensor_code
+  data_value_field: st_value_1_new
+  data_date_field: st_feed_date_jdn
+  #column headers in ARMS
+  
+mod_weather:
+  enable: 'true'
+mod_weather_temp:
+  enable: 'true'
+  
+mod_weather_S3:
+  enable: 'false'
+
+mod_hydro:
+  enable: 'true'
+mod_hydro_flow:
+  enable: 'true'
+mod_hydro_tide:
+  enable: 'true'
+
+mod_wq:
+  enable: 'true'
+mod_wq_catch:
+  enable: 'true'
+mod_wq_est:
+  enable: 'true'
+  
+mod_wq_mooring:
+  enable: 'true'
+  
+mod_phyto:
+  enable: 'true'
+  
+mod_hab:
+  enable: 'false'
+
+

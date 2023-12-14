@@ -1,0 +1,26 @@
+{
+    "id": "1703E062",
+    "path": "C:/Users/00101765/AED Dropbox/Sherry Zhai/SCEVO/dashboardV3.0/R/fct_databaseConnect.R",
+    "project_path": "R/fct_databaseConnect.R",
+    "type": "r_source",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1701929272928.0,
+    "source_on_save": false,
+    "relative_order": 14,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "29,3",
+        "scrollLine": "19"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1701929389,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1701929389641,
+    "read_only": false,
+    "read_only_alternatives": []
+}
