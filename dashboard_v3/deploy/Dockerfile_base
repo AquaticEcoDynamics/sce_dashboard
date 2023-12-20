@@ -1,0 +1,13 @@
+FROM rocker/r-ver:4.2.3
+
+# System dependencies
+RUN apt-get update && apt-get install -y  gdal-bin git-core libcairo2-dev libcurl4-openssl-dev libgdal-dev libgeos-dev libgeos++-dev libgit2-dev libicu-dev libpng-dev libproj-dev libssl-dev libxml2-dev make pandoc pandoc-citeproc zlib1g-dev cmake libharfbuzz-dev libfribidi-dev libudunits2-dev && rm -rf /var/lib/apt/lists/*
+
+#RUN mkdir -p /usr/local/lib/R/etc/ /usr/lib/R/etc/
+#RUN echo "options(renv.config.pak.enabled = TRUE, repos = c(CRAN = 'https://cran.rstudio.com/'), download.file.method = 'libcurl', Ncpus = 4)" | tee /usr/local/lib/R/etc/Rprofile.site | tee /usr/lib/R/etc/Rprofile.site
+#RUN R -e 'install.packages(c("renv","remotes"))'
+#COPY renv.lock renv.lock
+#RUN R -e 'renv::restore()'
+
+RUN R -e 'install.packages(c("golem", "aws.s3", "readr", "rsconnect", "plyr", "openxlsx", "rio", "rgdal", "svglite", "tidyverse", "ggprism", "ggh4x","patchwork","slickR","shinycssloaders","plotly","desc", "pkgload", "roxygen2","leaflet", "remotes", "RPostgreSQL", "shinydashboard", "shinyjs", "thinkr","EnvStats" ))'
+

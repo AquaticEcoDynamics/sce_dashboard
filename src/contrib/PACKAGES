@@ -1,0 +1,10 @@
+Package: scevo
+Version: 0.0.0.9000
+Depends: R (>= 3.5.0)
+Imports: bslib, config (>= 0.3.1), DBI, dbplyr, dplyr, golem (>=
+        0.3.1), leaflet, magrittr, pkgload, remotes, RPostgreSQL, shiny
+        (>= 1.7.1), shinydashboard, shinyjs, thinkr
+Suggests: testthat (>= 3.0.0)
+License: MIT + file LICENSE
+MD5sum: 97f015210d0a86655dfbc5d8d0f60ba4
+NeedsCompilation: no

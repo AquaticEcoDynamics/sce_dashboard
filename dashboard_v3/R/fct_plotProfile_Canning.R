@@ -1,0 +1,524 @@
+#' plotProfile_Canning
+#'
+#' @description A fct function
+#'
+#' @return The return value, if any, from executing the function.
+#'
+#' @noRd
+#' 
+#' 
+library (dplyr)
+library (sp)
+library (rivRmon)
+library (ggplot2)
+library (metR)
+library (grid)
+
+load("data/rivRmon_sysdata.rda")
+
+# select_week <- as.Date('2023-07-03')
+# ovit <- 'green'
+# ocav <- 'red'
+
+#rawwiski <- awss3Connect(filename = 'arms/wiski.csv')
+
+wiskiEnable <- as.logical(get_golem_config("enable", config = "wiski_connection"))
+
+if(isTRUE(wiskiEnable))
+{
+  rawwiski <- awss3Connect(filename = 'arms/wiski.csv')
+}else{
+  rawwiski <- read.csv(file = 'www/wiski.csv', check.names = FALSE)
+}
+
+rawwiski$`Collect Date` <- as.Date(rawwiski$`Collect Date`,format="%d/%m/%Y")
+cannsites <- c('BAC','BACD300','BACD500','BACU300','CASMID','ELL','GRE','KEN',
+               'KENU300','KS7','KS9','MACD50','MASD50','NIC','NIC-IN',
+               'NICD200','PAC','PO2','RIV','SAL','SCB2')
+
+# Creates correct colour palette for measured metric
+surfer_cols <- function(metric){
+  if(metric == "sal"){
+    sal_brk <- as.character(seq(2, 42, 2))
+    sal_cols <- c("#996633", "#916E3D", "#897648", "#817E53", "#79865D", "#718E68",
+                  "#699673", "#619E7E", "#59A688", "#51AE93", "#49B69E", "#41BEA9",
+                  "#39C6B3", "#31CEBE", "#29D6C9", "#21DED4", "#19E6DE", "#11EEE9",
+                  "#09F6F4", "#00FFFF", "#00FFFF")
+    names(sal_cols) <- sal_brk
+    return(sal_cols)
+  } else if(metric == "do"){
+    do_mg_l_brk <- as.character(seq(1, 17, 1))
+    do_mg_l_cols <- c("#FF0000", "#FF6600", "#FFCC00", "#DAC35D", "#B5BABA",
+                      "#A4E3E3", "#52F1F1", "#29DFF8", "#00CCFF", "#61EDC7",
+                      "#99FF99", "#99FF4D", "#99FF00", "#73D90C", "#4DB319",
+                      "#278D26", "#006633")
+    names(do_mg_l_cols) <- do_mg_l_brk
+    return(do_mg_l_cols)
+  } else if(metric == "chl"){
+    chl_brk <- c(as.character(seq(20, 80, 20)), "120", "160", "200", "300", "400", "1000")
+    # chlr_cols <- c("white","#d6f5d6","#99e699", "#47d147", "#248f24", "#145214",
+    #                "#990000", "#ff0000")
+    chlr_cols <- c("#e6ffff","#ebf9eb","#ccf2cc", "#a3e8a3", "#7ade7a", "#52d452",
+                   "#2eb82e", "#990000", "#cc0000", "#ff0000")
+    names(chlr_cols) <- chl_brk
+    return(chlr_cols)
+  } else {
+    temp_brk <- as.character(seq(11, 33, 1))
+    temp_cols <- c("#00FFFF", "#0CECFF", "#19D9FF", "#26C6FF", "#33B3FF",
+                   "#3FA0FF", "#4C8DFF", "#5284FF", "#597AFF", "#6373F0",
+                   "#6D6BE0", "#7764D0", "#825CC0", "#8C55B0", "#974DA0",
+                   "#A14590", "#AC3D80", "#B63670", "#C02E60", "#CA2750",
+                   "#D51F40", "#DF1830", "#EA1020")
+    names(temp_cols) <- temp_brk
+    return(temp_cols)
+  }
+}
+
+
+plotProfile_Canning <- function(plotDataWeek, StatusObac, StatusOnic){
+  
+  result <- tryCatch({  #this is to print error (if any) and skip instead of crashing the app
+  
+  samp_data <- rawwiski %>%  
+    dplyr::filter(`Collect Date` %in% as.Date(plotDataWeek,format="%Y-%m-%d") &
+                    `Program Site Ref` %in% cannsites & 
+                    `Collection Method` %in% 'Insitu' &
+                    `Data Category` %in% 'Instrument log')
+  
+  samp_data <- samp_data %>% 
+    rename("site" = "Program Site Ref",
+           'c' = 'Temperature (deg C)',
+           'sal_ppt' =  'Salinity (ppt)',
+           'do_mg_l' = 'O2-{DO conc} (mg/L)',
+           'chl_ug_l' = 'Chlorophyll a (in situ) (ug/L)',
+           'dep_m' = 'Sample Depth (m)')
+  
+  #samp_data$site <- replace(samp_data$site,samp_data$site == "SANDBR","SAND")
+  
+  comb_data <- dplyr::left_join(samp_data, C_sitesdf, by = "site")
+  
+  d_reduced <- comb_data %>%
+    dplyr::select(site, sal_ppt, do_mg_l, c, chl_ug_l, dep_m,
+                  dist_bridg, max_depth)
+  
+  #### bottom adjust
+  daily_depth <- d_reduced %>%
+    dplyr::group_by(dist_bridg) %>%
+    dplyr::summarise(d_depth = -1*(max(dep_m) + 0.2)) %>%
+    dplyr::mutate(dist_bridg = dist_bridg/1000)
+  
+  C_bottom_open1 <- C_bottom_open %>%
+    dplyr::left_join(daily_depth, by = c("x" = "dist_bridg")) %>%
+    dplyr::mutate(y = case_when(
+      !is.na(d_depth) ~ d_depth,
+      TRUE ~ y
+    )) %>%
+    dplyr::select(-d_depth)
+  
+  C_bottom_weir1 <- C_bottom_weir %>%
+    dplyr::left_join(daily_depth, by = c("x" = "dist_bridg")) %>%
+    dplyr::mutate(y = case_when(
+      !is.na(d_depth) ~ d_depth,
+      TRUE ~ y
+    )) %>%
+    dplyr::select(-d_depth)
+  
+  
+  # Set up labels and params to plot
+  sparams <- c("Salinity", "Dissolved_Oxygen", "Temperature", "Chlorophyll")
+  
+  # filter sampling data for separate interpolations
+  d_all <- d_reduced[stats::complete.cases(d_reduced),] %>%
+    dplyr::mutate(y = -1 * dep_m, x = dist_bridg/1000)
+  
+  d_low <- d_reduced[stats::complete.cases(d_reduced),] %>%
+    dplyr::mutate(y = -1 * dep_m, x = dist_bridg/1000) %>%
+    dplyr::filter(x < 11.3)
+  
+  d_up <- d_reduced[stats::complete.cases(d_reduced),] %>%
+    dplyr::mutate(y = -1 * dep_m, x = dist_bridg/1000) %>%
+    dplyr::filter(x > 11.3)
+  
+  # Based on TPS interps from here
+  vals <- c("sal_ppt", "do_mg_l", "c", "chl_ug_l")
+  tps_list_all <- vector("list", length(vals))
+  tps_list_weir <- vector("list", length(vals))
+  names(tps_list_all) <- vals
+  names(tps_list_weir) <- vals #will combine upper and lower here
+  
+  
+  # for all TPS
+  for(i in seq_along(vals)){
+    val <- vals[i]
+    d1 <- d_all[,c("x", "y", val)]
+    names(d1)[3] <- "value"
+    sp::coordinates(d1) <- ~x + y
+    
+    tpsmodall <- fields::Tps(sp::coordinates(d1), d1$value)
+    C_grd_all_R <- raster::raster(C_grd_all)
+    tps_surfaceall <- raster::interpolate(C_grd_all_R, tpsmodall)
+    tps_surfaceall[tps_surfaceall < 0] <- 0.1 # spline unfortunately interps to neg vals
+    
+    tps_r_classall <- raster::reclassify(tps_surfaceall, reclass_matrices[[i]])
+    tps_points <- raster::rasterToPoints(tps_r_classall, spatial = TRUE)
+    tps_df <- data.frame(tps_points)[-4]  # ditch option
+    names(tps_df)[1] <- sparams[i]
+    tps_list_all[[i]] <- tps_df
+  }
+  
+  # for weir
+  for(i in seq_along(vals)){
+    val <- vals[i]
+    d1 <- d_low[,c("x", "y", val)]
+    d2 <- d_up[,c("x", "y", val)]
+    names(d1)[3] <- "value"
+    names(d2)[3] <- "value"
+    sp::coordinates(d1) <- ~x + y
+    sp::coordinates(d2) <- ~x + y
+    
+    # for lower
+    tpsmodlc <- fields::Tps(sp::coordinates(d1), d1$value)
+    C_grd_low_R <- raster::raster(C_grd_low)
+    tps_surfacelc <- raster::interpolate(C_grd_low_R, tpsmodlc)
+    tps_surfacelc[tps_surfacelc < 0] <- 0.1  ####WEIRD NEG SYMBOL REMOVED
+    
+    # for upper
+    tpsmoduc <- fields::Tps(sp::coordinates(d2), d2$value)
+    C_grd_up_R <- raster::raster(C_grd_up)
+    tps_surfaceuc <- raster::interpolate(C_grd_up_R, tpsmoduc)
+    tps_surfaceuc[tps_surfaceuc < 0] <- 0.1 ####WEIRD NEG SYMBOL REMOVED
+    
+    # make one raster
+    comb_tps_surface <- raster::merge(tps_surfacelc, tps_surfaceuc)
+    
+    # reclassify
+    tps_r_class_comb <- raster::reclassify(comb_tps_surface, reclass_matrices[[i]])
+    tps_points <- raster::rasterToPoints(tps_r_class_comb, spatial = TRUE)
+    tps_df <- data.frame(tps_points)[-4]  # ditch option
+    names(tps_df)[1] <- sparams[i]
+    tps_list_weir[[i]] <- tps_df
+  }
+  
+  # make sample collection points
+  samp_locs <- comb_data %>%
+    dplyr::mutate(dist_bridg = dist_bridg/1000) %>%
+    dplyr::rename(x = dist_bridg, y = dep_m) %>%
+    dplyr::select(site, x, y)
+  
+  samp_labels <- c("SCB2", "SAL", "SHELL","RIV", "CASMID", "KEN", "BAC", "KS7", "NIC", "ELL")
+  samp_labels_locs <- C_sitesdf %>%
+    dplyr::filter(site %in% samp_labels)
+  
+  
+  # Logic for weir no weir
+  cannoxy <- c("KENU300", "BACD500", "BACD300", "BACU300", "PO2", "GRE", "KS7",
+               "MASD50", "NICD200", "KS9", "PAC", "MACD50")
+  if(sum(cannoxy %in% samp_locs$site) > 0 ){
+    bottom <- C_bottom_weir1
+    interp <- tps_list_weir
+    C_blockdf <- C_blockdf_weir
+  } else {
+    bottom <- C_bottom_open1
+    interp <- tps_list_all
+    C_blockdf <- C_blockdf_all
+  }
+  
+  # construct pretty date
+  # sday <- just_nums(as.numeric(substr(samp_date, 7, 8)))
+  # sdate <- paste(sday, format(ymd(samp_date), "%b %Y"), sep = " ")
+  
+  # oxy cols
+  oxy_col <- c(StatusObac, StatusOnic)
+  C_oxy_locs$c <- oxy_col
+  
+  # data frame of sites in this run
+  sites_this_week <- tibble(site = unique(d_all$site))
+  
+  # black out areas for plotting
+  rectdf <- C_blockdf %>%
+    anti_join(sites_this_week, by = "site")
+  
+  
+  salPlot <- ggplot()+
+    geom_tile(data = interp[[1]],
+              aes(x=x, y=y, fill = factor(Salinity))) +
+    scale_x_continuous(limits = c(0.5, 15.95),
+                       expand = c(0, 0),
+                       breaks = seq(0, 14, by = 2)) +
+    scale_y_continuous(breaks = c(0, -2, -4, -6),
+                       expand = expansion(mult = c(0, 0.05))) +
+    stat_contour2(data = interp[[1]], aes(x=x, y=y, z = Salinity),
+                  colour = "grey10",
+                  breaks = MakeBreaks(binwidth = 2),
+                  size = 0.1) +
+    scale_fill_manual(values = surfer_cols("sal"),
+                      guide = guide_legend(reverse=T),
+                      limits = as.character(seq(2, 42, 2))) + 
+    geom_rect(data = rectdf, aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax + 0.05),
+              fill = "black") +
+    geom_polygon(data = bottom,
+                 aes(x=x, y=y), fill = "grey90", colour = "grey20") +
+    geom_point(data = samp_locs,
+               aes(x = x, y = - y),
+               colour = "black",
+               size = 0.5) +
+    geom_text(data = samp_labels_locs,
+              aes(x = dist_bridg/1000, y = 0.7, label = site, fontface = 2),
+              size = 4.5,
+              colour = "black",
+              alpha = 1,
+              check_overlap = TRUE) +
+    annotate("text",
+             label = "Salinity (ppt)",
+             x = 3.25,
+             y = -5.65,
+             size = 9,
+             fontface = 2,
+             colour = "black") +
+    labs(y = "") +
+    theme(panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank(),
+          panel.background = element_blank(),
+          panel.border=element_blank(),
+          axis.line = element_line(colour = "black"),
+          axis.line.x = element_blank(),
+          axis.line.y = element_blank(),
+          axis.ticks.length.y.left = (unit(2, "mm")),
+          axis.ticks.length.y.right = (unit(2, "mm")),
+          axis.title = element_text(size = 20),
+          axis.text = element_text(size = 18),
+          axis.text.x = element_blank(),
+          axis.title.x = element_blank(),
+          plot.title = element_text(hjust=0.5, vjust=0.5, face='bold', size = 28),
+          plot.subtitle = element_text(hjust=0.5, vjust=0.5, size = 22),
+          legend.background = element_rect(fill = "transparent"),
+          legend.direction = "horizontal",
+          legend.position = c(0.43, 0.15),
+          legend.key.size =  unit(8, "mm"),
+          legend.title = element_blank(),
+          legend.text = element_text(size = 12),
+          plot.margin=grid::unit(c(0,0,0,0), "mm")) +
+    guides(fill = guide_legend(nrow = 1, byrow = TRUE,
+                               label.position = "bottom"))
+  
+  doPlot <- ggplot()+
+    geom_tile(data = interp[[2]],
+              aes(x=x, y=y, fill = factor(Dissolved_Oxygen))) +
+    scale_x_continuous(limits = c(0.5, 15.95),
+                       expand = c(0, 0),
+                       breaks = seq(0, 14, by = 2)) +
+    scale_y_continuous(expand = expansion(mult = c(0, .05))) +
+    stat_contour2(data = interp[[2]],
+                  aes(x=x, y=y, z = Dissolved_Oxygen),
+                  colour = "grey10",
+                  breaks = MakeBreaks(binwidth = 1),
+                  size = 0.1) +
+    scale_fill_manual(values = surfer_cols("do"),
+                      guide = guide_legend(reverse=T),
+                      limits = as.character(seq(1, 17, 1))) +
+    geom_rect(data = rectdf, aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax + 0.05),
+              fill = "black") +
+    geom_polygon(data = bottom,
+                 aes(x=x, y=y), fill = "grey90", colour = "grey20") +
+    geom_point(data = samp_locs,
+               aes(x = x, y = - y),
+               colour = "black",
+               size = 0.5) +
+    geom_point(data = C_oxy_locs,
+               aes(x = x, y = y),
+               size = 6,
+               colour = "black",
+               bg = C_oxy_locs$c,
+               shape = 24) +
+    annotate("text",
+             label = "Dissolved Oxygen (mg/L)",
+             x = 3.9,
+             y = -5.7,
+             size = 9,
+             fontface = 2,
+             colour = "black") +
+    labs(y = "Depth (m)") +
+    theme(panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank(),
+          panel.background = element_blank(),
+          panel.border=element_blank(),
+          axis.line = element_line(colour = "black"),
+          axis.line.x = element_blank(),
+          axis.line.y = element_blank(),
+          axis.ticks.length.y.left = (unit(2, "mm")),
+          axis.ticks.length.y.right = (unit(2, "mm")),
+          axis.title = element_text(size = 20),
+          axis.text = element_text(size = 18),
+          axis.text.x = element_blank(),
+          axis.title.x = element_blank(),
+          plot.title = element_text(hjust=0.5, vjust=0.5, face='bold'),
+          plot.subtitle = element_text(hjust=0.5, vjust=0.5),
+          legend.background = element_rect(fill = "transparent"),
+          legend.direction = "horizontal",
+          legend.position = c(0.43, 0.15),
+          legend.key.size =  unit(8, "mm"),
+          legend.title = element_blank(),
+          legend.text = element_text(size = 12),
+          plot.margin=grid::unit(c(0,0,0,0), "mm")) +
+    guides(fill = guide_legend(nrow = 1, byrow = TRUE,
+                               label.position = "bottom"))
+  
+  chlorPlot <- ggplot()+
+    geom_tile(data = interp[[4]],
+              aes(x=x, y=y, fill = factor(Chlorophyll)),
+              alpha = 0.5) +
+    scale_x_continuous(limits = c(0.5, 15.95),
+                       expand = c(0, 0),
+                       breaks = seq(0, 14, by = 2)) +
+    scale_y_continuous(expand = expansion(mult = c(0, .05))) +
+    stat_contour2(data = interp[[4]],
+                  aes(x=x, y=y, z = Chlorophyll),
+                  colour = "grey10",
+                  breaks = chl_brk,
+                  size = 0.1) +
+    scale_fill_manual(values = surfer_cols("chl"),
+                      guide = guide_legend(reverse=T),
+                      labels = c("20", "40", "60", "80", "120", "160",
+                                 "200", "300", "400", "> 400"),
+                      limits = c(as.character(seq(20, 80, 20)),
+                                 "120", "160", "200", "300", "400", "1000")) +
+    geom_rect(data = rectdf, aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax + 0.05),
+              fill = "black") +
+    geom_polygon(data = bottom,
+                 aes(x=x, y=y), fill = "grey90", colour = "grey20") +
+    geom_point(data = samp_locs,
+               aes(x = x, y = - y),
+               colour = "black",
+               size = 0.5) +
+    annotate("text",
+             label = expression('bold(paste("F-Chlorophyll (", mu,"g/L)"))'),
+             x = 3.7,
+             y = -5.8,
+             size = 9,
+             colour = "black", parse = TRUE) +
+    labs(x = "Distance From Entrance (km)",
+         y = "") +
+    theme(panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank(),
+          panel.background = element_blank(),
+          axis.line = element_line(colour = "black"),
+          axis.line.x = element_blank(),
+          axis.line.y = element_blank(),
+          axis.ticks.length.y.left = (unit(2, "mm")),
+          axis.ticks.length.y.right = (unit(2, "mm")),
+          axis.title = element_text(size = 20),
+          axis.text = element_text(size = 18),
+          axis.text.x = element_blank(),
+          axis.title.x = element_blank(),
+          plot.title = element_text(hjust=0.5, vjust=0.5, face='bold'),
+          plot.subtitle = element_text(hjust=0.5, vjust=0.5),
+          legend.background = element_rect(fill = "transparent"),
+          legend.direction = "horizontal",
+          legend.position = c(0.43, 0.15),
+          legend.key.size =  unit(8, "mm"),
+          legend.title = element_blank(),
+          legend.text = element_text(size = 12),
+          plot.margin=grid::unit(c(0,0,0,0), "mm")) +
+    guides(fill = guide_legend(nrow = 1, byrow = TRUE,
+                               label.position = "bottom"))
+  
+  tempPlot <- ggplot()+
+    geom_tile(data = interp[[3]],
+              aes(x=x, y=y, fill = factor(Temperature))) +
+    scale_x_continuous(limits = c(0.5, 15.95),
+                       expand = c(0, 0),
+                       breaks = seq(0, 14, by = 2)) +
+    scale_y_continuous(expand = expansion(mult = c(0, .05)))+
+    stat_contour2(data = interp[[3]],
+                  aes(x=x, y=y, z = Temperature),
+                  colour = "grey10",
+                  breaks = MakeBreaks(binwidth = 1),
+                  size = 0.1) +
+    scale_fill_manual(values = surfer_cols("temp"),
+                      guide = guide_legend(reverse=T),
+                      limits = as.character(seq(11, 33, 1))) +
+    geom_rect(data = rectdf, aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax + 0.05),
+              fill = "black") +
+    geom_polygon(data = bottom,
+                 aes(x=x, y=y), fill = "grey90", colour = "grey20") +
+    geom_point(data = samp_locs,
+               aes(x = x, y = - y),
+               colour = "black",
+               size = 0.5) +
+    annotate("text",
+             label = expression('bold(paste("Temperature (", degree,"C)"))'),
+             x = 3.4,
+             y = -5.7,
+             size = 9,
+             fontface = 2,
+             colour = "black", parse = TRUE) +
+    labs(x = "Distance From Canning Bridge (km)",
+         y = "") +
+    theme(panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank(),
+          panel.background = element_blank(),
+          panel.border=element_blank(),
+          axis.line = element_line(colour = "black"),
+          axis.line.y = element_blank(),
+          axis.ticks.length.y.left = (unit(2, "mm")),
+          axis.ticks.length.y.right = (unit(2, "mm")),
+          axis.title = element_text(size = 20),
+          axis.text = element_text(size = 18),
+          axis.text.x = element_text(vjust = 0.5),
+          plot.title = element_text(hjust=0.5, vjust=0.5, face='bold'),
+          plot.subtitle = element_text(hjust=0.5, vjust=0.5),
+          legend.background = element_rect(fill = "transparent"),
+          legend.direction = "horizontal",
+          legend.position = c(0.43, 0.15),
+          legend.key.size =  unit(8, "mm"),
+          legend.title = element_blank(),
+          legend.text = element_text(size = 12),
+          plot.margin=grid::unit(c(0,0,0,0), "mm")) +
+    guides(fill = guide_legend(nrow = 1, byrow = TRUE,
+                               label.position = "bottom"))
+  
+  plts <- list(salPlot, doPlot, chlorPlot, tempPlot)
+  #plts <- lapply(list(salPlot_s, doPlot_s, chlorPlot_s, tempPlot_s), ggplotly)
+  
+  plts
+  
+  # full length plots
+  # # create list of plotGrobs
+  # plta <- lapply(list(salPlot, doPlot, chlorPlot, tempPlot), ggplotGrob)
+  # # rbind (i.e. 1 column) size arg matters!
+  # surfers <- rbind(plta[[1]], plta[[2]], plta[[3]], plta[[4]], size = "first")
+  # # pdf_name <- paste0(path, "/plots/", "canning_", ymd(samp_date), "_surfer.pdf")
+  # png_name <- paste0(path, "/plots/", "canning_", ymd(samp_date), "_surfer.png")
+  # 
+  # # add margin padding coarse but effective
+  # # surfers_pad <- gtable::gtable_add_padding(surfers, padding = unit(c(1,4,3,4), "cm"))
+  # 
+  # # ggsave(plot = grid.draw(surfers), filename = pdf_name, width=28, height=18)
+  # # cat(paste0(pdf_name,"\n"))
+  # png(file = png_name, width = 1500, height = 960, res = 53, bg = "transparent")
+  # grid.draw(surfers)
+  # dev.off()
+  # cat(paste0(png_name,"\n"))
+  
+  
+  # If no error occurs, result will contain the result of your code
+  # and the loop will continue
+
+  }, error = function(e) {
+    # if error occurs print an error message
+      no_data_df <- data.frame(label = "data incomplete")
+      errorplot <- ggplot2::ggplot(no_data_df, aes(x = 1, y = 1, label = label)) +
+        geom_text(size = 10) +
+        theme_void()
+      
+      plts_error <- list(errorplot,errorplot,errorplot,errorplot)
+      plts_error
+
+    # Return a value or NULL if needed
+    
+    # Continue with the next iteration
+    #NULL
+  })
+  
+}
+  
