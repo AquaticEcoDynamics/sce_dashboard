@@ -13,10 +13,14 @@ Shiny data dashboard for displaying environmental data from the Swan-Canning Est
 Data included in the system are sourced from various agencies and programs, which are summarised in Table 1. Details for monitoring stations and status are listed in Table 2.
 
 Table 1. Summary of data sources included in the SCEVO system.
-![image](admin/table1.png)
+<br>
+![image](admin/table1.PNG)
+<br>
 
 Table 2. Summary of monitoring stations, data type and status in the SCEVO system.
+<br>
 ![image](admin/table2.png)
+<br>
 
 <br>
 
@@ -25,9 +29,13 @@ Table 2. Summary of monitoring stations, data type and status in the SCEVO syste
 ### Accessing and running the dashboard
 The sce_dashboard repository can be cloned via GitHub using GitHub Desktop or downloaded as a zip file. Once cloned and placed into your working directory, go to folder dashboard_Vx and double click the R project file scevo.Rproj. Note the dashboard was developed in R 4.1.0 and has not been tested in earlier versions.
 Once opened, run renv::restore() in the console or navigate to the Packages pane and click renv – Restore Library in R studio. This will ensure all the packages and dependencies (in the same versions as used in dashboard development) required by the dashboard are installed into the project library and contained within the project environment, which will not affect your existing R library.
+<br>
 ![image](admin/renv.png)
+<br>
 Once the R project environment is restored (i.e., packages installed), to start the dashboard app, open app.R (located in the main working directory) and either run the code in the console or click Run App on the top right corner of the R script pane in R studio. Depending on internet connection, it may take several minutes up to ~20 minutes to start the app. 
+<br>
 ![image](admin/runapp.png)
+<br>
 
 After the app is loaded properly, navigate to tabs and plot data as needed. Some plotting may take longer to process depending on the amount of data and calculation involved, as well as internet connection. Plots that usually required longer processing times are: 
 - Hydrology – Tide (due to data being high-frequency) 
@@ -44,8 +52,8 @@ Basic configurations of the dashboard are set in inst\golem-config.yml, includin
 - mod_xxx (logical): turns on/off individual modules (e.g. weather, hydro).
 
 Table 3. Dashboard data summary by tab.
-![image](admin/table3.png)
-
+<br>
+![image](admin/table3.PNG)
 <br>
 
 ### Basic editing
@@ -53,10 +61,14 @@ Dashboard contents that may require routine updates can be edited as below
 - update home page slideshow images: simply replace images in www\Images\. Compatible image format includes .png and .jpg. Note all images should be in the same size (width and height) for correct display.
 - update “About” text: this can be edited in their corresponding sections in app_server.R. For example, to edit ‘About’ for WQ tab, go to section ##### WQ - ABOUT #### and replace text within “xxx”. 
 - update monitoring site names/ID/agency/coordinates for mapping and site names appearing in ‘Select Site’ dropdown menu: edit corresponding csv file in www\ as listed in Table 4. Site names here only controls what appears in the dashboard and do not need to match database naming convention.
-![image](admin/table4.png)
+<br>
+![image](admin/table4.PNG)
+<br>
 
 - update variables in dropdown menu ‘Select Variable’: edit corresponding csv file in www\ as listed in Table 5. Variable names here only controls what appears in the dashboard dropdown menu and plot label/legend and do not need to match database naming convention. However, they must match site names in files listed in Table 4. The sensor_repository_xxxxx are the unique IDs used to fetch data from ARMS or Pawsey S3 so please ensure the ID exists in database before adding to the dashboard otherwise dashboard may crash if prompted to fetch an invalid ID.
-![image](admin/table5.png)
+<br>
+![image](admin/table5.PNG)
+<br>
 
 ### Advanced editing
 Advanced editing of the application server logic, functions, user interface (UI) may be completed by an experienced R user. An overview of the app structure is provided below as a guide:
