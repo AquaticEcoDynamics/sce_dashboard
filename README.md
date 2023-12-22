@@ -68,12 +68,14 @@ Dashboard contents that may require routine updates can be edited as below
 - update monitoring site names/ID/agency/coordinates for mapping and site names appearing in ‘Select Site’ dropdown menu: edit corresponding csv file in www\ as listed in Table 4. Site names here only controls what appears in the dashboard and do not need to match database naming convention.
 <br>
 Table 4. 
+
 ![image](admin/table4.PNG)
 <br>
 
 - update variables in dropdown menu ‘Select Variable’: edit corresponding csv file in www\ as listed in Table 5. Variable names here only controls what appears in the dashboard dropdown menu and plot label/legend and do not need to match database naming convention. However, they must match site names in files listed in Table 4. The sensor_repository_xxxxx are the unique IDs used to fetch data from ARMS or Pawsey S3 so please ensure the ID exists in database before adding to the dashboard otherwise dashboard may crash if prompted to fetch an invalid ID.
 <br>
 Table 5. 
+
 ![image](admin/table5.PNG)
 <br>
 
