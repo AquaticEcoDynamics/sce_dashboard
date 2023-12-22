@@ -14,11 +14,13 @@ Data included in the system are sourced from various agencies and programs, whic
 
 Table 1. Summary of data sources included in the SCEVO system.
 <br>
+
 ![image](admin/table1.PNG)
 <br>
 
 Table 2. Summary of monitoring stations, data type and status in the SCEVO system.
 <br>
+
 ![image](admin/table2.png)
 <br>
 
@@ -30,10 +32,12 @@ Table 2. Summary of monitoring stations, data type and status in the SCEVO syste
 The sce_dashboard repository can be cloned via GitHub using GitHub Desktop or downloaded as a zip file. Once cloned and placed into your working directory, go to folder dashboard_Vx and double click the R project file scevo.Rproj. Note the dashboard was developed in R 4.1.0 and has not been tested in earlier versions.
 Once opened, run renv::restore() in the console or navigate to the Packages pane and click renv – Restore Library in R studio. This will ensure all the packages and dependencies (in the same versions as used in dashboard development) required by the dashboard are installed into the project library and contained within the project environment, which will not affect your existing R library.
 <br>
+
 ![image](admin/renv.png)
 <br>
 Once the R project environment is restored (i.e., packages installed), to start the dashboard app, open app.R (located in the main working directory) and either run the code in the console or click Run App on the top right corner of the R script pane in R studio. Depending on internet connection, it may take several minutes up to ~20 minutes to start the app. 
 <br>
+
 ![image](admin/runapp.png)
 <br>
 
@@ -53,6 +57,7 @@ Basic configurations of the dashboard are set in inst\golem-config.yml, includin
 
 Table 3. Dashboard data summary by tab.
 <br>
+
 ![image](admin/table3.PNG)
 <br>
 
@@ -62,11 +67,13 @@ Dashboard contents that may require routine updates can be edited as below
 - update “About” text: this can be edited in their corresponding sections in app_server.R. For example, to edit ‘About’ for WQ tab, go to section ##### WQ - ABOUT #### and replace text within “xxx”. 
 - update monitoring site names/ID/agency/coordinates for mapping and site names appearing in ‘Select Site’ dropdown menu: edit corresponding csv file in www\ as listed in Table 4. Site names here only controls what appears in the dashboard and do not need to match database naming convention.
 <br>
+
 ![image](admin/table4.PNG)
 <br>
 
 - update variables in dropdown menu ‘Select Variable’: edit corresponding csv file in www\ as listed in Table 5. Variable names here only controls what appears in the dashboard dropdown menu and plot label/legend and do not need to match database naming convention. However, they must match site names in files listed in Table 4. The sensor_repository_xxxxx are the unique IDs used to fetch data from ARMS or Pawsey S3 so please ensure the ID exists in database before adding to the dashboard otherwise dashboard may crash if prompted to fetch an invalid ID.
 <br>
+
 ![image](admin/table5.PNG)
 <br>
 
