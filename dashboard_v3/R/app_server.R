@@ -1940,7 +1940,7 @@ app_server <- function( input, output, session ) {
     # output$profPlotWiski2 <- plotly::renderPlotly({ggplotly(plots[[2]])})
     # output$profPlotWiski3 <- plotly::renderPlotly({ggplotly(plots[[3]])})
     # output$profPlotWiski4 <- plotly::renderPlotly({ggplotly(plots[[4]])})
-    
+    if(input$select_region_profile =="Swan"){
     output$profPlotWiski1 <- renderPlot({plots[[1]]})
     output$profPlotWiski2 <- renderPlot({plots[[2]]})
     output$profPlotWiski3 <- renderPlot({plots[[3]]})
@@ -1949,6 +1949,14 @@ app_server <- function( input, output, session ) {
     output$profPlotWiski2z <- renderPlot({plots[[6]]})
     output$profPlotWiski3z <- renderPlot({plots[[7]]})
     output$profPlotWiski4z <- renderPlot({plots[[8]]})
+    }else{
+      if(input$select_region_profile =="Canning"){
+        output$profPlotWiski1 <- renderPlot({plots[[1]]})
+        output$profPlotWiski2 <- renderPlot({plots[[2]]})
+        output$profPlotWiski3 <- renderPlot({plots[[3]]})
+        output$profPlotWiski4 <- renderPlot({plots[[4]]})
+      }
+    }
   })
 
 

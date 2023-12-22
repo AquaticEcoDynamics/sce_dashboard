@@ -64,8 +64,8 @@ profileplotshistUI <- function(namespace){
             column(12,
           conditionalPanel(
             condition = "input.wqProfHistFetchData > 0",
-          shinycssloaders::withSpinner(slickROutput(outputId="profPlotHist",height = "900px" ))
-                                                    #width = "500px"  #this cuts the image instead of shrink it to size
+          shinycssloaders::withSpinner(slickROutput(outputId="profPlotHist",height = "940px" ))
+                                                    #width = "500px"  #this crops the image instead of shrink it to size
           )
             )
           )

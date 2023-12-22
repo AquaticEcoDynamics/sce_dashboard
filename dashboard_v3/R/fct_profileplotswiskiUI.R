@@ -66,10 +66,6 @@ profileplotswiskiUI <- function(namespace){
                                 style="margin-top: 83px; width: 100%")),
           conditionalPanel(
             condition = "input.wqProfFetchData > 0",
-          # shinycssloaders::withSpinner(plotly::plotlyOutput(outputId="profPlotWiski1",height = "300px")),
-          # shinycssloaders::withSpinner(plotly::plotlyOutput(outputId="profPlotWiski2",height = "300px")),
-          # shinycssloaders::withSpinner(plotly::plotlyOutput(outputId="profPlotWiski3",height = "300px")),
-          # shinycssloaders::withSpinner(plotly::plotlyOutput(outputId="profPlotWiski4",height = "350px"))
           column(12, offset = 0, style = "margin-top: 30px; margin-bottom: 20px; text-align: center; 
                  font-size: 24px; font-weight: bold;", "Full profile"),
           shinycssloaders::withSpinner(plotOutput(outputId="profPlotWiski1",height = "280px")),
@@ -83,6 +79,15 @@ profileplotswiskiUI <- function(namespace){
           shinycssloaders::withSpinner(plotOutput(outputId="profPlotWiski3z",height = "280px")),
           shinycssloaders::withSpinner(plotOutput(outputId="profPlotWiski4z",height = "320px"))
           )
+          # conditionalPanel(
+          #   condition = "input.wqProfFetchData > 0 && input.select_region_profile == 'Canning'",
+          #   column(12, offset = 0, style = "margin-top: 30px; margin-bottom: 20px; text-align: center; 
+          #        font-size: 24px; font-weight: bold;", "Full profile"),
+          #   shinycssloaders::withSpinner(plotOutput(outputId="profPlotWiski1",height = "280px")),
+          #   shinycssloaders::withSpinner(plotOutput(outputId="profPlotWiski2",height = "280px")),
+          #   shinycssloaders::withSpinner(plotOutput(outputId="profPlotWiski3",height = "280px")),
+          #   shinycssloaders::withSpinner(plotOutput(outputId="profPlotWiski4",height = "320px"))
+          # )
         )
       )
     )

@@ -77,6 +77,13 @@ surfer_cols <- function(metric){
 
 plotProfile_Canning <- function(plotDataWeek, StatusObac, StatusOnic){
   
+  library (dplyr)
+  library (sp)
+  library (rivRmon)
+  library (ggplot2)
+  library (metR)
+  library (grid)
+
   result <- tryCatch({  #this is to print error (if any) and skip instead of crashing the app
   
   samp_data <- rawwiski %>%  
@@ -270,8 +277,10 @@ plotProfile_Canning <- function(plotDataWeek, StatusObac, StatusOnic){
               check_overlap = TRUE) +
     annotate("text",
              label = "Salinity (ppt)",
-             x = 3.25,
-             y = -5.65,
+             # x = 3.25,
+             # y = -5.65,
+             x = 7.1,
+             y = -4.7,
              size = 9,
              fontface = 2,
              colour = "black") +
@@ -332,8 +341,10 @@ plotProfile_Canning <- function(plotDataWeek, StatusObac, StatusOnic){
                shape = 24) +
     annotate("text",
              label = "Dissolved Oxygen (mg/L)",
-             x = 3.9,
-             y = -5.7,
+             # x = 3.9,
+             # y = -5.7,
+             x = 7.1,
+             y = -5,
              size = 9,
              fontface = 2,
              colour = "black") +
@@ -392,8 +403,10 @@ plotProfile_Canning <- function(plotDataWeek, StatusObac, StatusOnic){
                size = 0.5) +
     annotate("text",
              label = expression('bold(paste("F-Chlorophyll (", mu,"g/L)"))'),
-             x = 3.7,
-             y = -5.8,
+             # x = 3.7,
+             # y = -5.8,
+             x = 7.1,
+             y = -5,
              size = 9,
              colour = "black", parse = TRUE) +
     labs(x = "Distance From Entrance (km)",
@@ -447,8 +460,10 @@ plotProfile_Canning <- function(plotDataWeek, StatusObac, StatusOnic){
                size = 0.5) +
     annotate("text",
              label = expression('bold(paste("Temperature (", degree,"C)"))'),
-             x = 3.4,
-             y = -5.7,
+             # x = 3.4,
+             # y = -5.7,
+             x = 7.1,
+             y = -5,
              size = 9,
              fontface = 2,
              colour = "black", parse = TRUE) +

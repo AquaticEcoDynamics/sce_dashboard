@@ -89,7 +89,7 @@ plotProfile_Swan <- function(plotDataWeek, StatusOvit, StatusOcav){
   library (metR)
   library (grid)
   
-#  result <- tryCatch({  #this is to print error (if any) and skip instead of crashing the app
+ result <- tryCatch({  #this is to print error (if any) and skip instead of crashing the app
   
 samp_data <- rawwiski %>%  
   dplyr::filter(`Collect Date` %in% as.Date(plotDataWeek,format="%Y-%m-%d") &
@@ -284,8 +284,10 @@ salPlot_s <- ggplot()+
             check_overlap = TRUE) +
   annotate("text",
            label = "Salinity (ppt)",
-           x = 19,
-           y = -16.5,
+           # x = 19,
+           # y = -16.5,
+           x = 34,
+           y = -15,
            size = 9,
            fontface =2,
            colour = "black") +
@@ -307,7 +309,8 @@ salPlot_s <- ggplot()+
         plot.subtitle = element_text(hjust=0.5, vjust=0.5, size = 22),
         legend.background = element_rect(fill = "transparent"),
         #legend.direction = "horizontal",
-        legend.position = c(0.65, 0.22),
+        #legend.position = c(0.65, 0.22),
+        legend.position = c(0.65, 0.15),
         legend.key.size =  unit(8, "mm"),
         legend.title = element_blank(),
         legend.text = element_text(size = 12),
@@ -349,8 +352,10 @@ doPlot_s <- ggplot()+
              shape = 24) +
   annotate("text",
            label = "Dissolved Oxygen (mg/L)",
-           x = 21,
-           y = -16.7,
+           # x = 21,
+           # y = -16.7,
+           x = 34,
+           y = -15,
            size = 9,
            fontface = 2,
            colour = "black") +
@@ -372,7 +377,8 @@ doPlot_s <- ggplot()+
         plot.subtitle = element_text(hjust=0.5, vjust=0.5),
         legend.background = element_rect(fill = "transparent"),
         legend.direction = "horizontal",
-        legend.position = c(0.65, 0.22),
+        #legend.position = c(0.65, 0.22),
+        legend.position = c(0.65, 0.15),
         legend.key.size =  unit(8, "mm"),
         legend.title = element_blank(),
         legend.text = element_text(size = 12),
@@ -411,8 +417,10 @@ chlorPlot_s <- ggplot()+
              size = 0.5) +
   annotate("text",
            label = expression('bold(paste("F-Chlorophyll (", mu,"g/L)"))'),
-           x = 20.4,
-           y = -16.8,
+           # x = 20.4,
+           # y = -16.8,
+           x = 34,
+           y = -15,
            size = 9,
            fontface =2,
            colour = "black", parse = TRUE) +
@@ -434,7 +442,8 @@ chlorPlot_s <- ggplot()+
         plot.subtitle = element_text(hjust=0.5, vjust=0.5, size = 22),
         legend.background = element_rect(fill = "transparent"),
         legend.direction = "horizontal",
-        legend.position = c(0.65, 0.22),
+        #legend.position = c(0.65, 0.22),
+        legend.position = c(0.65, 0.15),
         legend.key.size =  unit(8, "mm"),
         legend.title = element_blank(),
         legend.text = element_text(size = 12),
@@ -469,8 +478,10 @@ tempPlot_s <- ggplot()+
              size = 0.5) +
   annotate("text",
            label = expression('bold(paste("Temperature (", degree,"C)"))'),
-           x = 19,
-           y = -16.8,
+           # x = 19,
+           # y = -16.8,
+           x = 34,
+           y = -15,
            size = 9,
            fontface =2,
            colour = "black", parse = TRUE) +
@@ -491,7 +502,8 @@ tempPlot_s <- ggplot()+
         plot.subtitle = element_text(hjust = 0.5, vjust = 0.5, size = 22),
         legend.background = element_rect(fill = "transparent"),
         legend.direction = "horizontal",
-        legend.position = c(0.65, 0.22),
+        #legend.position = c(0.65, 0.22),
+        legend.position = c(0.65, 0.15),
         legend.key.size =  unit(8, "mm"),
         legend.title = element_blank(),
         legend.text = element_text(size = 12),
@@ -568,8 +580,10 @@ salPlotZ_s <- ggplot()+
             check_overlap = TRUE) +
   annotate("text",
            label = "Salinity (ppt)",
-           x = 32.8,
-           y = -7.4,
+           # x = 32.8,
+           # y = -7.4,
+           x = 41,
+           y = -6.7,
            size = 9,
            fontface =2,
            colour = "black") +
@@ -592,7 +606,8 @@ salPlotZ_s <- ggplot()+
         legend.background = element_rect(fill = "transparent"),
         legend.direction = "horizontal",
         legend.title = element_blank(),
-        legend.position = c(0.65, 0.22),
+        #legend.position = c(0.65, 0.22),
+        legend.position = c(0.65, 0.15),
         legend.key.size =  unit(8, "mm"),
         legend.text = element_text(size = 12),
         plot.margin=grid::unit(c(0,0,0,0), "mm")) +
@@ -632,8 +647,10 @@ doPlotZ_s <- ggplot()+
              shape = 24) +
   annotate("text",
            label = "Dissolved Oxygen (mg/L)",
-           x = 34,
-           y = -7.57,
+           # x = 34,
+           # y = -7.57,
+           x = 41,
+           y = -7,
            size = 9,
            fontface = 2,
            colour = "black") +
@@ -655,7 +672,8 @@ doPlotZ_s <- ggplot()+
         plot.subtitle = element_text(hjust=0.5, vjust=0.5),
         legend.background = element_rect(fill = "transparent"),
         legend.direction = "horizontal",
-        legend.position = c(0.65, 0.22),
+        #legend.position = c(0.65, 0.22),
+        legend.position = c(0.65, 0.15),
         legend.key.size =  unit(8, "mm"),
         legend.title = element_blank(),
         legend.text = element_text(size = 12),
@@ -693,8 +711,10 @@ chlorPlotZ_s <- ggplot()+
              size = 0.5) +
   annotate("text",
            label = expression('bold(paste("F-Chlorophyll (", mu,"g/L)"))'),
-           x = 33.6,
-           y = -7.6,
+           # x = 33.6,
+           # y = -7.6,
+           x = 41,
+           y = -7,
            size = 9,
            fontface =2,
            colour = "black", parse = TRUE) +
@@ -716,7 +736,8 @@ chlorPlotZ_s <- ggplot()+
         plot.subtitle = element_text(hjust=0.5, vjust=0.5, size = 22),
         legend.background = element_rect(fill = "transparent"),
         legend.direction = "horizontal",
-        legend.position = c(0.65, 0.22),
+        #legend.position = c(0.65, 0.22),
+        legend.position = c(0.65, 0.15),
         legend.key.size =  unit(8, "mm"),
         legend.title = element_blank(),
         legend.text = element_text(size = 12),
@@ -750,8 +771,10 @@ tempPlotZ_s <- ggplot()+
              size = 0.5) +
   annotate("text",
            label = expression('bold(paste("Temperature (", degree,"C)"))'),
-           x = 33,
-           y = -7.6,
+           # x = 33,
+           # y = -7.6,
+           x = 41,
+           y = -7,
            size = 9,
            fontface =2,
            colour = "black", parse = TRUE) +
@@ -772,7 +795,8 @@ tempPlotZ_s <- ggplot()+
         plot.subtitle = element_text(hjust = 0.5, vjust = 0.5, size = 22),
         legend.background = element_rect(fill = "transparent"),
         legend.direction = "horizontal",
-        legend.position = c(0.65, 0.22),
+        #legend.position = c(0.65, 0.22),
+        legend.position = c(0.65, 0.15),
         legend.key.size =  unit(8, "mm"),
         legend.title = element_blank(),
         legend.text = element_text(size = 12),
@@ -803,20 +827,20 @@ plts_all <- list(salPlot_s, doPlot_s, chlorPlot_s, tempPlot_s, salPlotZ_s, doPlo
 
 plts_all
 
-  # }, error = function(e) {
-  #   # if error occurs print an error message
-  #   no_data_df <- data.frame(label = "data incomplete")
-  #   errorplot <- ggplot2::ggplot(no_data_df, aes(x = 1, y = 1, label = label)) +
-  #     geom_text(size = 10) +
-  #     theme_void()
-  #   
-  #   plts_error <- list(errorplot,errorplot,errorplot,errorplot,errorplot,errorplot,errorplot,errorplot)
-  #   plts_error
-    
+  }, error = function(e) {
+    # if error occurs print an error message
+    no_data_df <- data.frame(label = "data incomplete")
+    errorplot <- ggplot2::ggplot(no_data_df, aes(x = 1, y = 1, label = label)) +
+      geom_text(size = 10) +
+      theme_void()
+
+    plts_error <- list(errorplot,errorplot,errorplot,errorplot,errorplot,errorplot,errorplot,errorplot)
+    plts_error
+
     # Return a value or NULL if needed
-    
+
     # Continue with the next iteration
     #NULL
-  # })
+  })
   
 }
