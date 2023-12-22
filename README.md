@@ -88,4 +88,5 @@ The data\ folder stores .rda files that are directly available to the app. The s
 - Instructions on adding to Shiny Proxy 
 
 ## Known issues
-- 
+- 'Elevation' layer on Water Quality map missing due to size limitation
+- Profile plot (static image) on 'Profiles - historic' tab gets cropped on smaller computer screens
